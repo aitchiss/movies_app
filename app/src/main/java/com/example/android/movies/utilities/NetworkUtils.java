@@ -26,7 +26,7 @@ public class NetworkUtils {
     private static final String LANGUAGE_ENGLISH = "en-GB";
     private static final String API_KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
-
+// Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
 
 
 

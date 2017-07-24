@@ -37,6 +37,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     Picasso.with(holder.mMovieImageView.getContext())
             .load(mMovieData[position].get("poster"))
+            .placeholder(R.drawable.ic_img_placeholder)
+            .error(R.drawable.ic_broken_image)
             .fit()
             .into(holder.mMovieImageView);
     }
