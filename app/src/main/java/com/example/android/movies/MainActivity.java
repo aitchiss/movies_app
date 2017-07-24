@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         apiKey = getString(R.string.my_api_key);
-        sortOption = "popularity";
+        sortOption = "popular";
 
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -55,17 +55,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_sort_highest_rated){
-            if (sortOption == "rating"){
+            if (sortOption == "top_rated"){
                 return true;
             } else {
-                sortOption = "rating";
+                sortOption = "top_rated";
                 loadMovieData();
             }
         } else if (item.getItemId() == R.id.action_sort_most_popular){
-            if (sortOption == "popularity"){
+            if (sortOption == "popular"){
                 return true;
             } else {
-                sortOption = "popularity";
+                sortOption = "popular";
                 loadMovieData();
             }
         }
