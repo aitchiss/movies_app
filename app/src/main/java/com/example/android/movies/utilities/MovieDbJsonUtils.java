@@ -35,7 +35,7 @@ public class MovieDbJsonUtils {
             JSONObject jsonMovie = movieArray.getJSONObject(i);
 
             movieInfo.put("title", jsonMovie.getString(MDB_TITLE));
-            movieInfo.put("poster", jsonMovie.getString(MDB_POSTER));
+            movieInfo.put("poster", "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER));
             movieInfo.put("overview", jsonMovie.getString(MDB_OVERVIEW));
             movieInfo.put("releaseDate", jsonMovie.getString(MDB_RELEASE_DATE));
 

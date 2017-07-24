@@ -5,7 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
@@ -31,7 +34,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     @Override
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
-        holder.mMovieTextView.setText(mMovieData[position].get("title"));
+
+    Picasso.with(holder.mMovieImageView.getContext())
+            .load(mMovieData[position].get("poster"))
+            .fit()
+            .into(holder.mMovieImageView);
     }
 
     @Override
@@ -50,11 +57,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     class MoviesAdapterViewHolder extends RecyclerView.ViewHolder{
 
-        public final TextView mMovieTextView;
+        public final ImageView mMovieImageView;
 
         public MoviesAdapterViewHolder(View itemView){
             super(itemView);
-            mMovieTextView = (TextView) itemView.findViewById(R.id.tv_movie_title);
+            mMovieImageView = (ImageView) itemView.findViewById(R.id.iv_movie_list_item);
         }
     }
 }
