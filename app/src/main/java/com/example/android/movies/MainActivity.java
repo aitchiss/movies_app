@@ -3,6 +3,8 @@ package com.example.android.movies;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -18,7 +20,8 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private String apiKey;
-    private TextView mMoviesList;
+    private RecyclerView mMovieRecyclerView;
+    private MoviesAdapter mMoviesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,13 @@ public class MainActivity extends AppCompatActivity {
 
         apiKey = getString(R.string.my_api_key);
 
-        mMoviesList = (TextView) findViewById(R.id.tv_movies_list);
+        mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
+        mMovieRecyclerView.setLayoutManager(layoutManager);
+
+        mMoviesAdapter = new MoviesAdapter();
+        mMovieRecyclerView.setAdapter(mMoviesAdapter);
+
         loadMovieData();
     }
 
@@ -48,19 +57,16 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e){
                 e.printStackTrace();
             }
-            Log.d("retrieved results", movieResults);
             return movieResults;
         }
 
         @Override
         protected void onPostExecute(String s) {
+//            Check that the string isn't empty, and parse/display
             if (s != null && !s.equals("")){
                 try {
                     HashMap<String, String>[] parsedMovieDetails = MovieDbJsonUtils.getMovieHashes(s);
-                    for(HashMap<String, String> movie : parsedMovieDetails){
-                        mMoviesList.append(movie.get("title") + "\n \n \n");
-                    }
-
+                    mMoviesAdapter.setMovieData(parsedMovieDetails);
                 } catch (JSONException e){
                     e.printStackTrace();
                 }

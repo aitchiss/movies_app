@@ -28,18 +28,18 @@ public class MovieDbJsonUtils {
         JSONArray movieArray = jsonMovies.getJSONArray("results");
         HashMap<String, String>[] movies =  new HashMap[movieArray.length()];
 
+//        Loops over the JSON array, and stores each movie as a HashMap in the movies array
+
         for (int i = 0; i < movieArray.length(); i++){
             HashMap<String, String> movieInfo = new HashMap<>();
             JSONObject jsonMovie = movieArray.getJSONObject(i);
 
             movieInfo.put("title", jsonMovie.getString(MDB_TITLE));
-            Log.d("title", jsonMovie.getString(MDB_TITLE));
             movieInfo.put("poster", jsonMovie.getString(MDB_POSTER));
             movieInfo.put("overview", jsonMovie.getString(MDB_OVERVIEW));
             movieInfo.put("releaseDate", jsonMovie.getString(MDB_RELEASE_DATE));
 
             movies[i] = movieInfo;
-
         }
 
         return movies;
