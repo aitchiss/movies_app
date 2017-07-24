@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.movies.utilities.MovieDbJsonUtils;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mMovieRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private String sortOption;
+    private TextView errorView;
+    private Button mRetryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
         apiKey = getString(R.string.my_api_key);
         sortOption = "popular";
+        errorView = (TextView) findViewById(R.id.tv_loading_error);
+        mRetryButton = (Button) findViewById(R.id.btn_error_retry);
 
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -77,32 +83,46 @@ public class MainActivity extends AppCompatActivity {
         new FetchMoviesTask().execute(url);
     }
 
+    public void showErrorView(){
+        errorView.setVisibility(View.VISIBLE);
+        mRetryButton.setVisibility(View.VISIBLE);
+        mMovieRecyclerView.setVisibility(View.INVISIBLE);
+    }
 
-    public class FetchMoviesTask extends AsyncTask<URL, Void, String>{
+    public void showMovieView(){
+        errorView.setVisibility(View.INVISIBLE);
+        mRetryButton.setVisibility(View.INVISIBLE);
+        mMovieRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    public void onRetryButtonClick(View view){
+        loadMovieData();
+    }
+
+
+    public class FetchMoviesTask extends AsyncTask<URL, Void, HashMap<String, String>[]>{
 
         @Override
-        protected String doInBackground(URL... params) {
+        protected HashMap<String, String>[] doInBackground(URL... params) {
             URL url = params[0];
-            String movieResults = null;
+            HashMap<String, String>[] parsedMovieDetails = null;
             try {
-                movieResults = NetworkUtils.getResponseFromHttpUrl(url);
-            } catch (IOException e){
+                String movieResults = NetworkUtils.getResponseFromHttpUrl(url);
+                parsedMovieDetails = MovieDbJsonUtils.getMovieHashes(movieResults);
+            } catch (Exception e){
                 e.printStackTrace();
             }
-            return movieResults;
+            return parsedMovieDetails;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(HashMap<String, String>[] movieDetails) {
 //            Check that the string isn't empty, and parse/display
-            if (s != null && !s.equals("")){
-                try {
-                    HashMap<String, String>[] parsedMovieDetails = MovieDbJsonUtils.getMovieHashes(s);
-                    mMoviesAdapter.setMovieData(parsedMovieDetails);
-                } catch (JSONException e){
-                    e.printStackTrace();
-                }
-
+            if (movieDetails != null){
+                showMovieView();
+                mMoviesAdapter.setMovieData(movieDetails);
+            } else {
+                showErrorView();
             }
         }
     }
