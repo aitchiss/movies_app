@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,7 +55,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             if (s != null && !s.equals("")){
-                mMoviesList.setText(s);
+                try {
+                    HashMap<String, String>[] parsedMovieDetails = MovieDbJsonUtils.getMovieHashes(s);
+                    for(HashMap<String, String> movie : parsedMovieDetails){
+                        mMoviesList.append(movie.get("title") + "\n \n \n");
+                    }
+
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
 
             }
         }
