@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.movies.utilities.MovieDbJsonUtils;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private String sortOption;
     private TextView errorView;
     private Button mRetryButton;
+    private ProgressBar mLoadingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         sortOption = "popular";
         errorView = (TextView) findViewById(R.id.tv_loading_error);
         mRetryButton = (Button) findViewById(R.id.btn_error_retry);
+        mLoadingBar = (ProgressBar) findViewById(R.id.pb_loading_bar);
 
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadMovieData(){
+        mLoadingBar.setVisibility(View.VISIBLE);
         URL url = NetworkUtils.buildUrl(apiKey, sortOption);
         new FetchMoviesTask().execute(url);
     }
@@ -87,11 +91,13 @@ public class MainActivity extends AppCompatActivity {
         errorView.setVisibility(View.VISIBLE);
         mRetryButton.setVisibility(View.VISIBLE);
         mMovieRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingBar.setVisibility(View.INVISIBLE);
     }
 
     public void showMovieView(){
         errorView.setVisibility(View.INVISIBLE);
         mRetryButton.setVisibility(View.INVISIBLE);
+        mLoadingBar.setVisibility(View.INVISIBLE);
         mMovieRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -117,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(HashMap<String, String>[] movieDetails) {
-//            Check that the string isn't empty, and parse/display
             if (movieDetails != null){
                 showMovieView();
                 mMoviesAdapter.setMovieData(movieDetails);
