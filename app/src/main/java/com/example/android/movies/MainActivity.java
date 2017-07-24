@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_sort_highest_rated){
-            if (sortOption == "vote_average"){
+            if (sortOption == "rating"){
                 return true;
             } else {
-                sortOption = "vote_average";
+                sortOption = "rating";
                 loadMovieData();
             }
         } else if (item.getItemId() == R.id.action_sort_most_popular){
