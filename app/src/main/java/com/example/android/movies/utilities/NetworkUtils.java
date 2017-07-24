@@ -21,8 +21,8 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    private static final String BASE_API_URL = "https://api.themoviedb.org/3/movie/";
-    private static final String TOP_RATED_PARAM = "top_rated";
+    private static final String BASE_API_URL = "https://api.themoviedb.org/3/discover/movie?";
+    private static final String SORT_BY_PARAM = "sort_by";
     private static final String LANGUAGE_PARAM = "language";
     private static final String LANGUAGE_ENGLISH = "en-GB";
     private static final String API_KEY_PARAM = "api_key";
@@ -30,10 +30,11 @@ public class NetworkUtils {
 
 
 
-    public static URL buildUrl(String ApiKey){
+
+    public static URL buildUrl(String apiKey, String sortOption){
         Uri builtUri = Uri.parse(BASE_API_URL).buildUpon()
-                .appendPath(TOP_RATED_PARAM)
-                .appendQueryParameter(API_KEY_PARAM, ApiKey)
+                .appendQueryParameter(SORT_BY_PARAM, sortOption + ".desc")
+                .appendQueryParameter(API_KEY_PARAM, apiKey)
                 .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE_ENGLISH)
                 .appendQueryParameter(PAGE_PARAM, "1")
                 .build();

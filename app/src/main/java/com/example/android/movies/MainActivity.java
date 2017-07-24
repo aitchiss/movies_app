@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.android.movies.utilities.MovieDbJsonUtils;
@@ -22,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private String apiKey;
     private RecyclerView mMovieRecyclerView;
     private MoviesAdapter mMoviesAdapter;
+    private String sortOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         apiKey = getString(R.string.my_api_key);
+        sortOption = "popularity";
 
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -40,8 +45,35 @@ public class MainActivity extends AppCompatActivity {
         loadMovieData();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_sort_highest_rated){
+            if (sortOption == "vote_average"){
+                return true;
+            } else {
+                sortOption = "vote_average";
+                loadMovieData();
+            }
+        } else if (item.getItemId() == R.id.action_sort_most_popular){
+            if (sortOption == "popularity"){
+                return true;
+            } else {
+                sortOption = "popularity";
+                loadMovieData();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void loadMovieData(){
-        URL url = NetworkUtils.buildUrl(apiKey);
+        URL url = NetworkUtils.buildUrl(apiKey, sortOption);
         new FetchMoviesTask().execute(url);
     }
 
