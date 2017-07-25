@@ -106,15 +106,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<URL, Void, HashMap<String, String>[]>{
+    public class FetchMoviesTask extends AsyncTask<URL, Void, Movie[]>{
 
         @Override
-        protected HashMap<String, String>[] doInBackground(URL... params) {
+        protected Movie[] doInBackground(URL... params) {
             URL url = params[0];
-            HashMap<String, String>[] parsedMovieDetails = null;
+            Movie[] parsedMovieDetails = null;
             try {
                 String movieResults = NetworkUtils.getResponseFromHttpUrl(url);
-                parsedMovieDetails = MovieDbJsonUtils.getMovieHashes(movieResults);
+                parsedMovieDetails = MovieDbJsonUtils.convertJsonToMovies(movieResults);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(HashMap<String, String>[] movieDetails) {
+        protected void onPostExecute(Movie[] movieDetails) {
             if (movieDetails != null){
                 showMovieView();
                 mMoviesAdapter.setMovieData(movieDetails);

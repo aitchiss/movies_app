@@ -2,6 +2,8 @@ package com.example.android.movies.utilities;
 
 import android.util.Log;
 
+import com.example.android.movies.Movie;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +16,7 @@ import java.util.HashMap;
 
 public class MovieDbJsonUtils {
 
-    public static HashMap<String, String>[] getMovieHashes(String jsonMovieDataString) throws JSONException{
+    public static Movie[] convertJsonToMovies(String jsonMovieDataString) throws JSONException{
 
 //        Keys to access the data we want to store and return:
         final String MDB_TITLE = "title";
@@ -26,20 +28,20 @@ public class MovieDbJsonUtils {
         JSONObject jsonMovies = new JSONObject(jsonMovieDataString);
 
         JSONArray movieArray = jsonMovies.getJSONArray("results");
-        HashMap<String, String>[] movies =  new HashMap[movieArray.length()];
+        Movie[] movies =  new Movie[movieArray.length()];
 
 //        Loops over the JSON array, and stores each movie as a HashMap in the movies array
 
         for (int i = 0; i < movieArray.length(); i++){
-            HashMap<String, String> movieInfo = new HashMap<>();
             JSONObject jsonMovie = movieArray.getJSONObject(i);
 
-            movieInfo.put("title", jsonMovie.getString(MDB_TITLE));
-            movieInfo.put("poster", "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER));
-            movieInfo.put("overview", jsonMovie.getString(MDB_OVERVIEW));
-            movieInfo.put("releaseDate", jsonMovie.getString(MDB_RELEASE_DATE));
+            String title = jsonMovie.getString(MDB_TITLE);
+            String poster = "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER);
+            String synopsis = jsonMovie.getString(MDB_OVERVIEW);
+            String releaseDate = jsonMovie.getString(MDB_RELEASE_DATE);
 
-            movies[i] = movieInfo;
+            Movie movie = new Movie(title, poster, synopsis, releaseDate);
+            movies[i] = movie;
         }
 
         return movies;

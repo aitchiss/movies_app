@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
-    private HashMap<String, String>[] mMovieData;
+    private Movie[] mMovieData;
 
     @Override
     public MoviesAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,7 +36,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
 
     Picasso.with(holder.mMovieImageView.getContext())
-            .load(mMovieData[position].get("poster"))
+            .load(mMovieData[position].getPosterPath())
             .placeholder(R.drawable.ic_img_placeholder)
             .error(R.drawable.ic_broken_image)
             .fit()
@@ -52,7 +52,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         }
     }
 
-    public void setMovieData(HashMap<String, String>[] movieData){
+    public void setMovieData(Movie[] movieData){
         mMovieData = movieData;
         notifyDataSetChanged();
     }
