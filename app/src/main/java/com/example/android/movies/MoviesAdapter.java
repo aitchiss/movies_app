@@ -6,11 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 
 /**
  * Created by suzanneaitchison on 24/07/2017.
@@ -37,8 +35,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     Picasso.with(holder.mMovieImageView.getContext())
             .load(mMovieData[position].getPosterPath())
-            .placeholder(R.drawable.ic_img_placeholder)
-            .error(R.drawable.ic_broken_image)
+            .placeholder(R.drawable.ic_image_placeholder)
+            .error(R.drawable.ic_broken_img)
             .fit()
             .into(holder.mMovieImageView);
     }

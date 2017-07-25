@@ -8,8 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
 /**
  * Created by suzanneaitchison on 24/07/2017.
  */
@@ -24,16 +22,15 @@ public class MovieDbJsonUtils {
         final String MDB_OVERVIEW = "overview";
         final String MDB_RELEASE_DATE = "release_date";
 
-
         JSONObject jsonMovies = new JSONObject(jsonMovieDataString);
+        JSONArray jsonMovieArray = jsonMovies.getJSONArray("results");
 
-        JSONArray movieArray = jsonMovies.getJSONArray("results");
-        Movie[] movies =  new Movie[movieArray.length()];
+        Movie[] movies =  new Movie[jsonMovieArray.length()];
 
-//        Loops over the JSON array, and stores each movie as a HashMap in the movies array
+//        Loops over the JSON array, and creates a Movie object, storing in the movies array
 
-        for (int i = 0; i < movieArray.length(); i++){
-            JSONObject jsonMovie = movieArray.getJSONObject(i);
+        for (int i = 0; i < jsonMovieArray.length(); i++){
+            JSONObject jsonMovie = jsonMovieArray.getJSONObject(i);
 
             String title = jsonMovie.getString(MDB_TITLE);
             String poster = "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER);

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mMovieRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private String sortOption;
-    private TextView errorView;
+    private TextView mErrorView;
     private Button mRetryButton;
     private ProgressBar mLoadingBar;
 
@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         apiKey = getString(R.string.my_api_key);
+//        use sharedPrefs or similar to check what sort option should be on create?
         sortOption = "popular";
-        errorView = (TextView) findViewById(R.id.tv_loading_error);
+        mErrorView = (TextView) findViewById(R.id.tv_loading_error);
         mRetryButton = (Button) findViewById(R.id.btn_error_retry);
         mLoadingBar = (ProgressBar) findViewById(R.id.pb_loading_bar);
 
@@ -88,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showErrorView(){
-        errorView.setVisibility(View.VISIBLE);
+        mErrorView.setVisibility(View.VISIBLE);
         mRetryButton.setVisibility(View.VISIBLE);
         mMovieRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingBar.setVisibility(View.INVISIBLE);
     }
 
     public void showMovieView(){
-        errorView.setVisibility(View.INVISIBLE);
+        mErrorView.setVisibility(View.INVISIBLE);
         mRetryButton.setVisibility(View.INVISIBLE);
         mLoadingBar.setVisibility(View.INVISIBLE);
         mMovieRecyclerView.setVisibility(View.VISIBLE);
