@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+//        if a new sort option has been selected, reload the correct movies, otherwise ignore
         if (item.getItemId() == R.id.action_sort_highest_rated){
             if (sortOption == "top_rated"){
                 return true;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public void loadMovieData(){
         mLoadingBar.setVisibility(View.VISIBLE);
