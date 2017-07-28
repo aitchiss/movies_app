@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/loading_error"
-        android:background="@color/colorBackground"
         android:visibility="invisible"
         android:orientation="vertical"
         >
@@ -34,7 +33,6 @@
             android:textSize="20dp"
             android:layout_margin="20dp"
             android:layout_gravity="center"
-            android:textColor="@color/colorFont"
             android:text="Unable to load content. Please check you are connected to the internet and retry."
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
