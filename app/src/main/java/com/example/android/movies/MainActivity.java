@@ -1,5 +1,6 @@
 package com.example.android.movies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -105,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onClick(Movie movie) {
         Log.d("movie clicked", String.valueOf(movie.getTitle()));
+
+        Intent detailsActivityIntent = new Intent(this, MovieDetailActivity.class);
+        startActivity(detailsActivityIntent);
     }
 
     public void onRetryButtonClick(View view){
