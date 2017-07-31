@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieClickHandler {
 
     private String apiKey;
     private RecyclerView mMovieRecyclerView;
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         mMovieRecyclerView.setLayoutManager(layoutManager);
 
-        mMoviesAdapter = new MoviesAdapter();
+        mMoviesAdapter = new MoviesAdapter(this);
         mMovieRecyclerView.setAdapter(mMoviesAdapter);
 
         loadMovieData();
@@ -100,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mLoadingBar.setVisibility(View.INVISIBLE);
         mMovieRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+        Log.d("movie clicked", String.valueOf(movie.getTitle()));
     }
 
     public void onRetryButtonClick(View view){
