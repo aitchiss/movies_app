@@ -50,7 +50,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mTitle.setText(mCurrentMovie.getTitle());
         mSynopsis.setText(mCurrentMovie.getSynopsis());
         mReleaseDate.setText(mCurrentMovie.getReleaseDate());
-        mRating.setText(String.valueOf(mCurrentMovie.getRating()));
+        mRating.setText(String.valueOf(mCurrentMovie.getRating()) + " / 10");
         populatePoster();
     }
 

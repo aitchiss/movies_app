@@ -36,7 +36,7 @@ public class MovieDbJsonUtils {
             String title = jsonMovie.getString(MDB_TITLE);
             String poster = "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER);
             String synopsis = jsonMovie.getString(MDB_OVERVIEW);
-            String releaseDate = jsonMovie.getString(MDB_RELEASE_DATE);
+            String releaseDate = convertToUKDate(jsonMovie.getString(MDB_RELEASE_DATE));
             int rating = jsonMovie.getInt(MDB_RATING);
 
             Movie movie = new Movie(title, poster, synopsis, releaseDate, rating);
@@ -45,4 +45,11 @@ public class MovieDbJsonUtils {
 
         return movies;
     }
+
+    private static String convertToUKDate(String date){
+        String[] dateComponents = date.split("-");
+        String formattedDate = dateComponents[2] + "/" + dateComponents[1] + "/" + dateComponents[0];
+        return formattedDate;
+    }
+
 }
