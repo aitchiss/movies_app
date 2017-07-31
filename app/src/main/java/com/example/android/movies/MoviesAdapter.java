@@ -16,6 +16,10 @@ import com.squareup.picasso.Picasso;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
+    public interface MovieClickHandler{
+        void onClick(Movie movie);
+    }
+
     private Movie[] mMovieData;
 
     @Override
