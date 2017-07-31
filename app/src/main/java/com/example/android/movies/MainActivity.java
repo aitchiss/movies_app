@@ -108,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         Log.d("movie clicked", String.valueOf(movie.getTitle()));
 
         Intent detailsActivityIntent = new Intent(this, MovieDetailActivity.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("movie", movie);
+        detailsActivityIntent.putExtras(bundle);
+
         startActivity(detailsActivityIntent);
     }
 
