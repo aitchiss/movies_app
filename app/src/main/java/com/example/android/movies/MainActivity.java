@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private String sortOption;
     private ProgressBar mLoadingBar;
     private LinearLayout mLoadingErrorMessage;
+    private Movie[] mCurrentMovies;
 
 
     @Override
@@ -43,17 +45,20 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         apiKey = getString(R.string.my_api_key);
 //        use sharedPrefs or similar to check what sort option should be on create?
-        sortOption = "popular";
+
         mLoadingBar = (ProgressBar) findViewById(R.id.pb_loading_bar);
         mLoadingErrorMessage = (LinearLayout) findViewById(R.id.loading_error);
 
 
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
 
+//        Set number of posters in grid according to device orientation
         int currentOrientation = getResources().getConfiguration().orientation;
         RecyclerView.LayoutManager layoutManager = null;
+
         if (currentOrientation == 1){
             layoutManager = new GridLayoutManager(this, 2);
         } else {
@@ -61,12 +66,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         }
 
         mMovieRecyclerView.setLayoutManager(layoutManager);
-
         mMoviesAdapter = new MoviesAdapter(this);
         mMovieRecyclerView.setAdapter(mMoviesAdapter);
 
-        loadMovieData();
+//        Retain current list of movies after a rotation without making another network call
+        if (savedInstanceState != null && savedInstanceState.containsKey("movies")){
+            mCurrentMovies = (Movie[]) savedInstanceState.getParcelableArray("movies");
+            showMovieView();
+            mMoviesAdapter.setMovieData(mCurrentMovies);
+            sortOption = savedInstanceState.getString("sortOption");
+        } else {
+            sortOption = "popular";
+            loadMovieData();
+        }
     }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArray("movies", mCurrentMovies);
+        outState.putString("sortOption", sortOption);
+        super.onSaveInstanceState(outState);
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         @Override
         protected void onPostExecute(Movie[] movieDetails) {
             if (movieDetails != null){
+                mCurrentMovies = movieDetails;
                 showMovieView();
                 mMoviesAdapter.setMovieData(movieDetails);
             } else {
