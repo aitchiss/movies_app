@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -17,7 +18,7 @@ import org.w3c.dom.Text;
 public class MovieDetailActivity extends AppCompatActivity {
 
     private LinearLayout mMovieDetailsErrorLayout;
-    private LinearLayout mMovieDetailsLayout;
+    private ScrollView mMovieDetailsLayout;
     private Movie mCurrentMovie;
     private TextView mTitle;
     private TextView mSynopsis;
@@ -32,7 +33,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 //        Get a reference to the error layout and standard layout
         mMovieDetailsErrorLayout = (LinearLayout) findViewById(R.id.layout_movie_details_error);
-        mMovieDetailsLayout = (LinearLayout) findViewById(R.id.layout_movie_details);
+        mMovieDetailsLayout = (ScrollView) findViewById(R.id.layout_movie_details);
 
 //        Get a reference to all of the TextViews and ImageView
         mTitle = (TextView) findViewById(R.id.tv_movie_title);
