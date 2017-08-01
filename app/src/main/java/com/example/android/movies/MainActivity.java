@@ -49,8 +49,17 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mLoadingBar = (ProgressBar) findViewById(R.id.pb_loading_bar);
         mLoadingErrorMessage = (LinearLayout) findViewById(R.id.loading_error);
 
+
         mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        RecyclerView.LayoutManager layoutManager = null;
+        if (currentOrientation == 1){
+            layoutManager = new GridLayoutManager(this, 2);
+        } else {
+            layoutManager = new GridLayoutManager(this, 3);
+        }
+
         mMovieRecyclerView.setLayoutManager(layoutManager);
 
         mMoviesAdapter = new MoviesAdapter(this);
