@@ -1,6 +1,9 @@
 package com.example.android.movies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -86,9 +89,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
 
     public void loadMovieData(){
-        mLoadingBar.setVisibility(View.VISIBLE);
-        URL url = NetworkUtils.buildUrl(apiKey, sortOption);
-        new FetchMoviesTask().execute(url);
+//        only attempt to load movies if device is online or connecting to internet
+        if (isOnlineOrConnecting()){
+            mLoadingBar.setVisibility(View.VISIBLE);
+            URL url = NetworkUtils.buildUrl(apiKey, sortOption);
+            new FetchMoviesTask().execute(url);
+        } else {
+            showErrorView();
+        }
     }
 
     public void showErrorView(){
@@ -103,10 +111,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMovieRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    public boolean isOnlineOrConnecting(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
+    }
+
     @Override
     public void onClick(Movie movie) {
-        Log.d("movie clicked", String.valueOf(movie.getTitle()));
-
         Intent detailsActivityIntent = new Intent(this, MovieDetailActivity.class);
 
         Bundle bundle = new Bundle();
