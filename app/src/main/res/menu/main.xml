@@ -3,9 +3,9 @@
 
     <item
         android:id="@+id/action_sort_most_popular"
-        android:title="Sort: Most Popular"/>
+        android:title="@string/sort_popular"/>
 
     <item
         android:id="@+id/action_sort_highest_rated"
-        android:title="Sort: Highest Rated"/>
+        android:title="@string/sort_highest_rated"/>
 </menu>

@@ -22,9 +22,11 @@ public class MovieDbJsonUtils {
         final String MDB_OVERVIEW = "overview";
         final String MDB_RELEASE_DATE = "release_date";
         final String MDB_RATING = "vote_average";
+        final String MDB_RESULTS = "results";
+        final String MDB_POSTER_PATH_PREFIX = "http://image.tmdb.org/t/p/w185";
 
         JSONObject jsonMovies = new JSONObject(jsonMovieDataString);
-        JSONArray jsonMovieArray = jsonMovies.getJSONArray("results");
+        JSONArray jsonMovieArray = jsonMovies.getJSONArray(MDB_RESULTS);
 
         Movie[] movies =  new Movie[jsonMovieArray.length()];
 
@@ -34,7 +36,7 @@ public class MovieDbJsonUtils {
             JSONObject jsonMovie = jsonMovieArray.getJSONObject(i);
 
             String title = jsonMovie.getString(MDB_TITLE);
-            String poster = "http://image.tmdb.org/t/p/w185" + jsonMovie.getString(MDB_POSTER);
+            String poster = MDB_POSTER_PATH_PREFIX + jsonMovie.getString(MDB_POSTER);
             String synopsis = jsonMovie.getString(MDB_OVERVIEW);
             String releaseDate = convertToUKDate(jsonMovie.getString(MDB_RELEASE_DATE));
             int rating = jsonMovie.getInt(MDB_RATING);

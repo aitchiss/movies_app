@@ -26,6 +26,7 @@ public class NetworkUtils {
     private static final String LANGUAGE_ENGLISH = "en-GB";
     private static final String API_KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
+    private static final String FIRST_PAGE = "1";
 // Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
 
 
@@ -35,13 +36,12 @@ public class NetworkUtils {
                 .appendPath(sortOption)
                 .appendQueryParameter(API_KEY_PARAM, apiKey)
                 .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE_ENGLISH)
-                .appendQueryParameter(PAGE_PARAM, "1")
+                .appendQueryParameter(PAGE_PARAM, FIRST_PAGE)
                 .build();
 
         URL url = null;
         try {
             url = new URL(builtUri.toString());
-            Log.d("URL Built: ", String.valueOf(url));
         } catch (MalformedURLException e){
             e.printStackTrace();
         }

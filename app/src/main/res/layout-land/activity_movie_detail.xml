@@ -57,7 +57,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Release date"
+                            android:text="@string/release_date"
                             android:textSize="15dp" />
 
                         <TextView
@@ -70,7 +70,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="15dp"
-                            android:text="Average user rating"
+                            android:text="@string/avg_user_rating"
                             android:textSize="15dp" />
 
                         <TextView
@@ -115,7 +115,7 @@
             android:textSize="20dp"
             android:layout_margin="20dp"
             android:layout_gravity="center"
-            android:text="Oops! Something went wrong, please try again later."/>
+            android:text="@string/oops_try_later"/>
 
     </LinearLayout>
 

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Movies</string>
+    <string name="unable_to_load_content">Unable to load content. Please check you are connected to the internet and retry.</string>
+    <string name="retry">Retry</string>
+    <string name="release_date">Release date</string>
+    <string name="avg_user_rating">Average user rating</string>
+    <string name="oops_try_later">Oops! Something went wrong, please try again later.</string>
+    <string name="sort_highest_rated">Sort: Highest Rated</string>
+    <string name="sort_popular">Sort: Most Popular</string>
 </resources>

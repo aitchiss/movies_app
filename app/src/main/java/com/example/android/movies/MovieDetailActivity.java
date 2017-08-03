@@ -17,6 +17,9 @@ import org.w3c.dom.Text;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
+    private static final String MOVIE = "movie";
+    private static final String OUT_OF_TEN = " / 10";
+
     private LinearLayout mMovieDetailsErrorLayout;
     private ScrollView mMovieDetailsLayout;
     private Movie mCurrentMovie;
@@ -47,8 +50,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         Bundle b = intent.getExtras();
 
 //        Populate the movie details if possible, otherwise show the error view
-        if (b.getParcelable("movie") != null){
-            Movie movieChoice = b.getParcelable("movie");
+        if (b.getParcelable(MOVIE) != null){
+            Movie movieChoice = b.getParcelable(MOVIE);
             mCurrentMovie = movieChoice;
             populateMovieDetails();
         } else {
@@ -61,7 +64,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mTitle.setText(mCurrentMovie.getTitle());
         mSynopsis.setText(mCurrentMovie.getSynopsis());
         mReleaseDate.setText(mCurrentMovie.getReleaseDate());
-        mRating.setText(String.valueOf(mCurrentMovie.getRating()) + " / 10");
+        mRating.setText(String.valueOf(mCurrentMovie.getRating()) + OUT_OF_TEN);
         populatePoster();
     }
 
