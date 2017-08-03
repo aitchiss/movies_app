@@ -1,27 +1,20 @@
 package com.example.android.movies;
 
 import android.content.Intent;
-import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
     private static final String MOVIE = "movie";
-    private static final String OUT_OF_TEN = " / 10";
 
-    private LinearLayout mMovieDetailsErrorLayout;
-    private ScrollView mMovieDetailsLayout;
     private Movie mCurrentMovie;
     private TextView mTitle;
     private TextView mSynopsis;
@@ -35,8 +28,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
 
 //        Get a reference to the error layout and standard layout
-        mMovieDetailsErrorLayout = (LinearLayout) findViewById(R.id.layout_movie_details_error);
-        mMovieDetailsLayout = (ScrollView) findViewById(R.id.layout_movie_details);
+        LinearLayout movieDetailsErrorLayout = (LinearLayout) findViewById(R.id.layout_movie_details_error);
+        ScrollView movieDetailsLayout = (ScrollView) findViewById(R.id.layout_movie_details);
 
 //        Get a reference to all of the TextViews and ImageView
         mTitle = (TextView) findViewById(R.id.tv_movie_title);
@@ -51,12 +44,11 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 //        Populate the movie details if possible, otherwise show the error view
         if (b.getParcelable(MOVIE) != null){
-            Movie movieChoice = b.getParcelable(MOVIE);
-            mCurrentMovie = movieChoice;
+            mCurrentMovie = b.getParcelable(MOVIE);
             populateMovieDetails();
         } else {
-            mMovieDetailsLayout.setVisibility(View.INVISIBLE);
-            mMovieDetailsErrorLayout.setVisibility(View.VISIBLE);
+            movieDetailsLayout.setVisibility(View.INVISIBLE);
+            movieDetailsErrorLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -64,7 +56,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mTitle.setText(mCurrentMovie.getTitle());
         mSynopsis.setText(mCurrentMovie.getSynopsis());
         mReleaseDate.setText(mCurrentMovie.getReleaseDate());
-        mRating.setText(String.valueOf(mCurrentMovie.getRating()) + OUT_OF_TEN);
+        mRating.setText(getString(R.string.rating_score, mCurrentMovie.getRating()));
         populatePoster();
     }
 

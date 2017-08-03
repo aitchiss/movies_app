@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movies</string>
+    <string name="app_name">Top Movies</string>
     <string name="unable_to_load_content">Unable to load content. Please check you are connected to the internet and retry.</string>
     <string name="retry">Retry</string>
     <string name="release_date">Release date</string>
@@ -7,4 +7,6 @@
     <string name="oops_try_later">Oops! Something went wrong, please try again later.</string>
     <string name="sort_highest_rated">Sort: Highest Rated</string>
     <string name="sort_popular">Sort: Most Popular</string>
+    <string name="iv_alt_poster">Movie poster</string>
+    <string name="rating_score">%1$s / 10</string>
 </resources>

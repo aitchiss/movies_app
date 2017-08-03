@@ -1,21 +1,14 @@
 package com.example.android.movies.utilities;
 
 import android.net.Uri;
-import android.util.Log;
-
-import com.example.android.movies.R;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-/**
- * Created by suzanneaitchison on 24/07/2017.
- */
+
 
 // used to execute API requests
 

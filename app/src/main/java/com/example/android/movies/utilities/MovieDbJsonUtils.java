@@ -1,16 +1,12 @@
 package com.example.android.movies.utilities;
 
-import android.util.Log;
 
 import com.example.android.movies.Movie;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by suzanneaitchison on 24/07/2017.
- */
+
 
 public class MovieDbJsonUtils {
 
@@ -50,8 +46,7 @@ public class MovieDbJsonUtils {
 
     private static String convertToUKDate(String date){
         String[] dateComponents = date.split("-");
-        String formattedDate = dateComponents[2] + "/" + dateComponents[1] + "/" + dateComponents[0];
-        return formattedDate;
+        return dateComponents[2] + "/" + dateComponents[1] + "/" + dateComponents[0];
     }
 
 }

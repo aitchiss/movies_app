@@ -10,9 +10,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 
-/**
- * Created by suzanneaitchison on 24/07/2017.
- */
+
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
@@ -21,7 +19,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     }
 
     private Movie[] mMovieData;
-    private MovieClickHandler mClickHandler;
+    private final MovieClickHandler mClickHandler;
 
     public MoviesAdapter(MovieClickHandler clickHandler){
         mClickHandler = clickHandler;
@@ -32,11 +30,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         Context context = parent.getContext();
         int layoutId = R.layout.movie_list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
 
-        View view = inflater.inflate(layoutId, parent, shouldAttachToParentImmediately);
-        MoviesAdapterViewHolder viewHolder = new MoviesAdapterViewHolder(view);
-        return viewHolder;
+        View view = inflater.inflate(layoutId, parent, false);
+        return new MoviesAdapterViewHolder(view);
     }
 
     @Override

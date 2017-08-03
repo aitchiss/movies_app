@@ -3,17 +3,15 @@ package com.example.android.movies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by suzanneaitchison on 25/07/2017.
- */
+
 
 public class Movie implements Parcelable {
 
-    private String title;
-    private String posterPath;
-    private String synopsis;
-    private String releaseDate;
-    private int rating;
+    private final String title;
+    private final String posterPath;
+    private final String synopsis;
+    private final String releaseDate;
+    private final int rating;
 
     public Movie(String title, String posterPath, String synopsis, String releaseDate, int rating){
         this.title = title;
@@ -23,7 +21,7 @@ public class Movie implements Parcelable {
         this.rating = rating;
     }
 
-    public Movie(Parcel parcel){
+    private Movie(Parcel parcel){
         this.title = parcel.readString();
         this.posterPath = parcel.readString();
         this.synopsis = parcel.readString();
@@ -61,8 +59,8 @@ public class Movie implements Parcelable {
         return releaseDate;
     }
 
-    public int getRating(){
-        return this.rating;
+    public String getRating(){
+        return String.valueOf(this.rating);
     }
 
     public final static Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){

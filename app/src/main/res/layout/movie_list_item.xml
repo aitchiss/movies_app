@@ -6,6 +6,7 @@
 
     <ImageView
         android:id="@+id/iv_movie_list_item"
+        android:contentDescription="@string/iv_alt_poster"
         android:adjustViewBounds="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
