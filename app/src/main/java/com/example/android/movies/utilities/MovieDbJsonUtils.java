@@ -13,6 +13,7 @@ public class MovieDbJsonUtils {
     public static Movie[] convertJsonToMovies(String jsonMovieDataString) throws JSONException{
 
 //        Keys to access the data we want to store and return:
+        final String MDB_ID = "id";
         final String MDB_TITLE = "title";
         final String MDB_POSTER = "poster_path";
         final String MDB_OVERVIEW = "overview";
@@ -31,13 +32,14 @@ public class MovieDbJsonUtils {
         for (int i = 0; i < jsonMovieArray.length(); i++){
             JSONObject jsonMovie = jsonMovieArray.getJSONObject(i);
 
+            int id = jsonMovie.getInt(MDB_ID);
             String title = jsonMovie.getString(MDB_TITLE);
             String poster = MDB_POSTER_PATH_PREFIX + jsonMovie.getString(MDB_POSTER);
             String synopsis = jsonMovie.getString(MDB_OVERVIEW);
             String releaseDate = convertToUKDate(jsonMovie.getString(MDB_RELEASE_DATE));
             int rating = jsonMovie.getInt(MDB_RATING);
 
-            Movie movie = new Movie(title, poster, synopsis, releaseDate, rating);
+            Movie movie = new Movie(title, poster, synopsis, releaseDate, rating, id);
             movies[i] = movie;
         }
 

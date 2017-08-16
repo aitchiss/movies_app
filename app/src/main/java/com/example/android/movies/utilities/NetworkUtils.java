@@ -20,6 +20,8 @@ public class NetworkUtils {
     private static final String API_KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
     private static final String FIRST_PAGE = "1";
+
+    private static final String TRAILER_PATH = "videos";
 // Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
 
 
@@ -27,6 +29,25 @@ public class NetworkUtils {
     public static URL buildUrl(String apiKey, String sortOption){
         Uri builtUri = Uri.parse(BASE_API_URL).buildUpon()
                 .appendPath(sortOption)
+                .appendQueryParameter(API_KEY_PARAM, apiKey)
+                .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE_ENGLISH)
+                .appendQueryParameter(PAGE_PARAM, FIRST_PAGE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    public static URL buildTrailerUrl(String apiKey, int movieId){
+        Uri builtUri = Uri.parse(BASE_API_URL).buildUpon()
+                .appendPath(String.valueOf(movieId))
+                .appendPath(TRAILER_PATH)
                 .appendQueryParameter(API_KEY_PARAM, apiKey)
                 .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE_ENGLISH)
                 .appendQueryParameter(PAGE_PARAM, FIRST_PAGE)
