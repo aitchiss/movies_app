@@ -2,6 +2,8 @@ package com.example.android.movies.utilities;
 
 
 import com.example.android.movies.Movie;
+import com.example.android.movies.Trailer;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +11,8 @@ import org.json.JSONObject;
 
 
 public class MovieDbJsonUtils {
+
+//    TODO COMBINE THESE FUNCTIONS TO REMOVE DUPLICATION
 
     public static Movie[] convertJsonToMovies(String jsonMovieDataString) throws JSONException{
 
@@ -44,6 +48,30 @@ public class MovieDbJsonUtils {
         }
 
         return movies;
+    }
+
+    public static Trailer[] convertJsonToTrailers(String jsonTrailerString) throws JSONException {
+        final String TRAILER_ID = "id";
+        final String TRAILER_RESULTS = "results";
+        final String TRAILER_NAME = "name";
+        final String TRAILER_KEY = "key";
+
+        JSONObject jsonTrailers = new JSONObject(jsonTrailerString);
+        JSONArray jsonTrailerArray = jsonTrailers.getJSONArray(TRAILER_RESULTS);
+
+        Trailer[] trailers = new Trailer[jsonTrailerArray.length()];
+
+        for (int i = 0; i < jsonTrailerArray.length(); i++){
+            JSONObject jsonTrailer = jsonTrailerArray.getJSONObject(i);
+
+            String id = jsonTrailer.getString(TRAILER_ID);
+            String name = jsonTrailer.getString(TRAILER_NAME);
+            String youTubeKey = jsonTrailer.getString(TRAILER_KEY);
+
+            Trailer trailer = new Trailer(id, name, youTubeKey);
+            trailers[i] = trailer;
+        }
+        return trailers;
     }
 
     private static String convertToUKDate(String date){

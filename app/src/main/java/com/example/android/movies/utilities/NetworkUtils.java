@@ -20,9 +20,12 @@ public class NetworkUtils {
     private static final String API_KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
     private static final String FIRST_PAGE = "1";
+    // Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
 
     private static final String TRAILER_PATH = "videos";
-// Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
+
+    private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+
 
 
 
@@ -79,5 +82,9 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static Uri getYouTubeTrailerUri(String trailerKey){
+        return Uri.parse(YOUTUBE_BASE_URL + trailerKey);
     }
 }

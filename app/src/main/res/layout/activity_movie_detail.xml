@@ -78,6 +78,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:weightSum="1.0"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
@@ -86,13 +88,26 @@
 
                 <TextView
                     android:id="@+id/tv_movie_synopsis"
+                    android:layout_weight="0.5"
                     android:textSize="17sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <TextView
+                    android:id="@+id/tv_trailers_header"
+                    android:text="@string/trailers_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include layout="@layout/trailer_list"/>
+
             </LinearLayout>
 
+
+
         </LinearLayout>
+
+
 
     </ScrollView>
 

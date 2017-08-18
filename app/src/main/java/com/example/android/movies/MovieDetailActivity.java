@@ -4,26 +4,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
 
 
-public class MovieDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class MovieDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>, TrailersAdapter.TrailerClickHandler {
 
     private static String apiKey;
 
@@ -38,6 +45,9 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     private TextView mRating;
     private ImageView mPoster;
 
+    private Trailer[] mTrailers;
+    private TrailersAdapter mTrailersAdapter;
+    private RecyclerView mTrailersRecyclerView;
 
 
     @Override
@@ -87,7 +97,12 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
             movieDetailsErrorLayout.setVisibility(View.VISIBLE);
         }
 
-
+//        Get a reference to the Trailers Adapter
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mTrailersRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_trailers_list);
+        mTrailersRecyclerView.setLayoutManager(layoutManager);
+        mTrailersAdapter = new TrailersAdapter(this);
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
     }
 
     private void populateMovieDetails(){
@@ -107,6 +122,18 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 .into(mPoster);
     }
 
+    public void onClick(Trailer trailer){
+        String trailerKey = trailer.getYouTubeKey();
+        Uri youTubeTrailerUri = NetworkUtils.getYouTubeTrailerUri(trailerKey);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(youTubeTrailerUri);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
 
     @Override
     public Loader<String> onCreateLoader(int id, final Bundle args) {
@@ -115,9 +142,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
-                Log.d("loader", "on start");
                 if (args == null){
-                    Log.d("loader", "null");
                     return;
                 }
                 forceLoad();
@@ -126,29 +151,34 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
             @Override
             public String loadInBackground() {
-                Log.d("loader", "now");
                 int movieId = args.getInt(MOVIE_ID_EXTRA);
                 if (movieId < 0){
                     return null;
                 }
                 try {
-//                    TODO MAKE A FUNCTION IN NETWORK UTILS TO GRAB THE TRAILER INFO
                     URL url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
                     String results = NetworkUtils.getResponseFromHttpUrl(url);
-                    Log.d("loader results", results);
-                    return null;
+                    return results;
                 } catch (IOException e){
                     e.printStackTrace();
                     return null;
                 }
-//                TODO RETURN THE RESULTS
             }
         };
     }
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        Log.d("loader", "finished");
+        if (data != null){
+            try {
+                mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
+                mTrailersAdapter.setTrailerData(mTrailers);
+
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+
+        }
     }
 
     @Override

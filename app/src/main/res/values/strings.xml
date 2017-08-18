@@ -9,4 +9,5 @@
     <string name="sort_popular">Sort: Most Popular</string>
     <string name="iv_alt_poster">Movie poster</string>
     <string name="rating_score">%1$s / 10</string>
+    <string name="trailers_header">Trailers</string>
 </resources>
