@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     private void loadMovieData(){
 //        only attempt to load movies if device is online or connecting to internet
-        if (isOnlineOrConnecting()){
+        if (NetworkUtils.isOnlineOrConnecting(this)){
             mLoadingBar.setVisibility(View.VISIBLE);
             URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
             new FetchMoviesTask().execute(url);
@@ -140,11 +140,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMovieRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private boolean isOnlineOrConnecting(){
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnectedOrConnecting();
-    }
 
     @Override
     public void onClick(Movie movie) {

@@ -101,6 +101,14 @@
 
                 <include layout="@layout/trailer_list"/>
 
+                <TextView
+                    android:id="@+id/tv_reviews_header"
+                    android:text="@string/reviews_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                
+                <include layout="@layout/review_list" />
+
             </LinearLayout>
 
 

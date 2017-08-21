@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
@@ -36,6 +35,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
     private static final String MOVIE = "movie";
     private static final int TRAILER_DETAILS_LOADER = 101;
+    private static final int REVIEW_DETAILS_LOADER = 102;
+    private static final String LOADER_ID_EXTRA = "loaderId";
     private static final String MOVIE_ID_EXTRA = "movieId";
 
     private Movie mCurrentMovie;
@@ -48,6 +49,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     private Trailer[] mTrailers;
     private TrailersAdapter mTrailersAdapter;
     private RecyclerView mTrailersRecyclerView;
+
+    private Review[] mReviews;
 
 
     @Override
@@ -77,32 +80,15 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         if (b.getParcelable(MOVIE) != null){
             mCurrentMovie = b.getParcelable(MOVIE);
             populateMovieDetails();
-
-            // Create a query bundle for Loader to get trailer details
-            Bundle trailerQueryBundle = new Bundle();
-            trailerQueryBundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
-            Log.d("loader", "creating");
-
-            LoaderManager loaderManager = getSupportLoaderManager();
-            Loader<String> trailersLoader = loaderManager.getLoader(TRAILER_DETAILS_LOADER);
-            if (trailersLoader == null){
-                Log.d("loader", "init");
-                loaderManager.initLoader(TRAILER_DETAILS_LOADER, trailerQueryBundle, this);
-            } else {
-                loaderManager.restartLoader(TRAILER_DETAILS_LOADER, trailerQueryBundle, this);
-            }
+            getTrailerInfo();
+            getReviewInfo();
 
         } else {
             movieDetailsLayout.setVisibility(View.INVISIBLE);
             movieDetailsErrorLayout.setVisibility(View.VISIBLE);
         }
 
-//        Get a reference to the Trailers Adapter
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mTrailersRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_trailers_list);
-        mTrailersRecyclerView.setLayoutManager(layoutManager);
-        mTrailersAdapter = new TrailersAdapter(this);
-        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+        setUpTrailersAdapter();
     }
 
     private void populateMovieDetails(){
@@ -122,6 +108,50 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 .into(mPoster);
     }
 
+    private void getTrailerInfo(){
+
+        if (NetworkUtils.isOnlineOrConnecting(this)){
+            // Create a query bundle for Loader to get trailer details
+            Bundle trailerQueryBundle = new Bundle();
+            trailerQueryBundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
+            initOrRestartLoader(trailerQueryBundle, TRAILER_DETAILS_LOADER);
+        } else {
+//            TODO - ADD AN ERROR MESSAGE FOR WHEN TRAILERS CANT BE LOADED
+        }
+
+    }
+
+    private void getReviewInfo(){
+        if (NetworkUtils.isOnlineOrConnecting(this)){
+            // Create a query bundle for Loader to get review details
+            Bundle reviewQueryBundle = new Bundle();
+            reviewQueryBundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
+            initOrRestartLoader(reviewQueryBundle, REVIEW_DETAILS_LOADER);
+
+        } else {
+//            TODO - ADD AN ERROR MESSAGE FOR WHEN REVIEWS CANT BE LOADED
+        }
+    }
+
+    private void initOrRestartLoader(Bundle bundle, int loaderId){
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<String> loader = loaderManager.getLoader(loaderId);
+        if (loader == null){
+            loaderManager.initLoader(loaderId, bundle, this);
+        } else {
+            loaderManager.restartLoader(loaderId, bundle, this);
+        }
+    }
+
+
+    private void setUpTrailersAdapter(){
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mTrailersRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_trailers_list);
+        mTrailersRecyclerView.setLayoutManager(layoutManager);
+        mTrailersAdapter = new TrailersAdapter(this);
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+    }
+
     public void onClick(Trailer trailer){
         String trailerKey = trailer.getYouTubeKey();
         Uri youTubeTrailerUri = NetworkUtils.getYouTubeTrailerUri(trailerKey);
@@ -136,7 +166,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
 
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
+    public Loader<String> onCreateLoader(final int id, final Bundle args) {
         return new AsyncTaskLoader<String>(this) {
 
             @Override
@@ -152,11 +182,23 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
             @Override
             public String loadInBackground() {
                 int movieId = args.getInt(MOVIE_ID_EXTRA);
+                URL url;
+
+                switch(id){
+                    case TRAILER_DETAILS_LOADER:
+                        url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
+                        break;
+                    case REVIEW_DETAILS_LOADER:
+                        url = NetworkUtils.buildReviewUrl(apiKey, movieId);
+                        break;
+                    default:
+                        url = null;
+                }
+
                 if (movieId < 0){
                     return null;
                 }
                 try {
-                    URL url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
                     String results = NetworkUtils.getResponseFromHttpUrl(url);
                     return results;
                 } catch (IOException e){
@@ -169,16 +211,23 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        if (data != null){
-            try {
+        if (data == null){
+            return;
+        }
+
+        try {
+            if (loader.getId() == TRAILER_DETAILS_LOADER){
                 mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
                 mTrailersAdapter.setTrailerData(mTrailers);
-
-            } catch (JSONException e){
-                e.printStackTrace();
+            } else if (loader.getId() == REVIEW_DETAILS_LOADER){
+                mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
+                Log.d("loader", String.valueOf(mReviews.length));
             }
 
+        } catch (JSONException e){
+            e.printStackTrace();
         }
+
     }
 
     @Override

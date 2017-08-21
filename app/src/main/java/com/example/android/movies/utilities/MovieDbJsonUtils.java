@@ -2,6 +2,7 @@ package com.example.android.movies.utilities;
 
 
 import com.example.android.movies.Movie;
+import com.example.android.movies.Review;
 import com.example.android.movies.Trailer;
 
 import org.json.JSONArray;
@@ -72,6 +73,31 @@ public class MovieDbJsonUtils {
             trailers[i] = trailer;
         }
         return trailers;
+    }
+
+    public static Review[] convertJsonToReviews(String jsonReviewString) throws JSONException{
+        final String REVIEW_ID = "id";
+        final String REVIEW_RESULTS = "results";
+        final String REVIEW_AUTHOR = "author";
+        final String REVIEW_CONTENT = "content";
+
+        JSONObject jsonReviews = new JSONObject(jsonReviewString);
+        JSONArray jsonReviewsArray = jsonReviews.getJSONArray(REVIEW_RESULTS);
+
+        Review[] reviews = new Review[jsonReviewsArray.length()];
+
+        for (int i = 0; i < jsonReviewsArray.length(); i++){
+            JSONObject jsonReview = jsonReviewsArray.getJSONObject(i);
+
+            String id = jsonReview.getString(REVIEW_ID);
+            String author = jsonReview.getString(REVIEW_AUTHOR);
+            String content = jsonReview.getString(REVIEW_CONTENT);
+
+            Review review = new Review(id, author, content);
+            reviews[i] = review;
+
+        }
+        return reviews;
     }
 
     private static String convertToUKDate(String date){

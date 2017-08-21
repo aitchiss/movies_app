@@ -1,5 +1,8 @@
 package com.example.android.movies.utilities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +26,7 @@ public class NetworkUtils {
     // Limited to one page of data for consistency - in future would want a subsequent API call if user scrolls to bottom
 
     private static final String TRAILER_PATH = "videos";
+    private static final String REVIEW_PATH = "reviews";
 
     private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
 
@@ -66,6 +70,27 @@ public class NetworkUtils {
         return url;
     }
 
+    public static URL buildReviewUrl(String apiKey, int movieId){
+//        TODO REFACTOR OUT DUPLICATION IN BUILDING URLS
+        Uri builtUri = Uri.parse(BASE_API_URL).buildUpon()
+                .appendPath(String.valueOf(movieId))
+                .appendPath(REVIEW_PATH)
+                .appendQueryParameter(API_KEY_PARAM, apiKey)
+                .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE_ENGLISH)
+                .appendQueryParameter(PAGE_PARAM, FIRST_PAGE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+
     public static String getResponseFromHttpUrl(URL url) throws IOException{
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -86,5 +111,11 @@ public class NetworkUtils {
 
     public static Uri getYouTubeTrailerUri(String trailerKey){
         return Uri.parse(YOUTUBE_BASE_URL + trailerKey);
+    }
+
+    public static boolean isOnlineOrConnecting(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 }
