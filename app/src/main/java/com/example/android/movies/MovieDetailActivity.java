@@ -37,7 +37,6 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     private static final String MOVIE = "movie";
     private static final int TRAILER_DETAILS_LOADER = 101;
     private static final int REVIEW_DETAILS_LOADER = 102;
-    private static final String LOADER_ID_EXTRA = "loaderId";
     private static final String MOVIE_ID_EXTRA = "movieId";
 
     private Movie mCurrentMovie;
@@ -233,9 +232,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 mTrailersAdapter.setTrailerData(mTrailers);
             } else if (loader.getId() == REVIEW_DETAILS_LOADER){
                 mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
-                Log.d("loader", data);
                 mReviewsAdapter.setReviewData(mReviews);
-
             }
 
         } catch (JSONException e){
