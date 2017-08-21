@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -51,6 +52,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     private RecyclerView mTrailersRecyclerView;
 
     private Review[] mReviews;
+    private RecyclerView mReviewsRecyclerView;
+    private ReviewsAdapter mReviewsAdapter;
 
 
     @Override
@@ -89,6 +92,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         }
 
         setUpTrailersAdapter();
+        setUpReviewsAdapter();
     }
 
     private void populateMovieDetails(){
@@ -150,6 +154,14 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         mTrailersRecyclerView.setLayoutManager(layoutManager);
         mTrailersAdapter = new TrailersAdapter(this);
         mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+    }
+
+    private void setUpReviewsAdapter(){
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mReviewsRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews_list);
+        mReviewsRecyclerView.setLayoutManager(layoutManager);
+        mReviewsAdapter = new ReviewsAdapter();
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
     }
 
     public void onClick(Trailer trailer){
@@ -221,7 +233,9 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 mTrailersAdapter.setTrailerData(mTrailers);
             } else if (loader.getId() == REVIEW_DETAILS_LOADER){
                 mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
-                Log.d("loader", String.valueOf(mReviews.length));
+                Log.d("loader", data);
+                mReviewsAdapter.setReviewData(mReviews);
+
             }
 
         } catch (JSONException e){
