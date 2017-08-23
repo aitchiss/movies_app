@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class FavouritesDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "favourites.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public FavouritesDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -21,7 +21,7 @@ public class FavouritesDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_FAVOURITES_TABLE = "CREATE TABLE " + FavouritesContract.FavouritesEntry.TABLE_NAME + " (" +
                 FavouritesContract.FavouritesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, " +
+                FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                 FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                 FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT, " +
                 FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT, " +

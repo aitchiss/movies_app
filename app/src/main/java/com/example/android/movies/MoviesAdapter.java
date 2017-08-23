@@ -2,6 +2,7 @@ package com.example.android.movies;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     public void setMovieData(Movie[] movieData){
         mMovieData = movieData;
+        Log.d("setting movies", String.valueOf(mMovieData.length));
         notifyDataSetChanged();
     }
 

@@ -1,5 +1,6 @@
 package com.example.android.movies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -19,7 +20,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.movies.data.FavouritesContract;
 import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -172,6 +175,24 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
+        }
+    }
+
+    public void onFavouritesClick(View view) {
+//        On Favourites button click, add the movie to the Favourites db
+//        TODO ALTER THIS SO THAT IT DOESN'T PUT DUPLICATES IN THE DB
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, mCurrentMovie.getId());
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, mCurrentMovie.getTitle());
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH, mCurrentMovie.getPosterPath());
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RATING, mCurrentMovie.getRating());
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE, mCurrentMovie.getReleaseDate());
+        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_SYNOPSIS, mCurrentMovie.getSynopsis());
+
+        Uri uri = getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
+
+        if (uri != null) {
+            Toast.makeText(getBaseContext(), R.string.added_to_favourites_conf, Toast.LENGTH_LONG).show();
         }
     }
 

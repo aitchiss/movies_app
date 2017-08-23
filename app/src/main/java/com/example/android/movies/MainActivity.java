@@ -1,10 +1,15 @@
 package com.example.android.movies;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,18 +21,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
+import com.example.android.movies.data.FavouritesContract;
+import com.example.android.movies.data.FavouritesCursorUtils;
 import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieClickHandler {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieClickHandler, LoaderManager.LoaderCallbacks<Cursor> {
 
 //    String constants used to refer to API sort options and keys for bundles
     private static final String SORT_POPULAR = "popular";
     private static final String SORT_HIGHEST_RATED = "top_rated";
+    private static final String SORT_FAVOURITES = "favourites";
     private static final String SORT_OPTION = "sortOption";
     private static final String MOVIES = "movies";
     private static final String MOVIE = "movie";
+
+    private static final int FAVOURITES_LOADER_ID = 10;
 
     private String apiKey;
     private RecyclerView mMovieRecyclerView;
@@ -42,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 //      Retrieve key String from secrets values resource
         apiKey = getString(R.string.my_api_key);
@@ -64,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMovieRecyclerView.setLayoutManager(layoutManager);
         mMoviesAdapter = new MoviesAdapter(this);
         mMovieRecyclerView.setAdapter(mMoviesAdapter);
-
 //        Retain current list of movies without making another network call
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIES)){
             mCurrentMovies = (Movie[]) savedInstanceState.getParcelableArray(MOVIES);
@@ -84,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         outState.putString(SORT_OPTION, mSortOption);
         super.onSaveInstanceState(outState);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,6 +124,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 loadMovieData();
                 return true;
             }
+        } else if (item.getItemId() == R.id.action_favourites){
+            if (mSortOption.equals(SORT_FAVOURITES)){
+                return true;
+            } else {
+                mSortOption = SORT_FAVOURITES;
+                loadFavourites();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -125,6 +145,19 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             new FetchMoviesTask().execute(url);
         } else {
             showErrorView();
+        }
+    }
+
+    private void loadFavourites(){
+//        use content provider to display favourite movies.
+//        Favourites held in local db, and can be displayed when offline
+        mLoadingBar.setVisibility(View.VISIBLE);
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<Cursor> loader = loaderManager.getLoader(FAVOURITES_LOADER_ID);
+        if (loader == null){
+            loaderManager.initLoader(FAVOURITES_LOADER_ID, null, this);
+        } else {
+            loaderManager.restartLoader(FAVOURITES_LOADER_ID, null, this);
         }
     }
 
@@ -154,6 +187,53 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     public void onRetryButtonClick(View view){
         loadMovieData();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<Cursor>(this) {
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                if (mSortOption.equals(SORT_FAVOURITES)){
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+//                Get all the favourite movies and display them in alphabetical order
+                try {
+                    return getContentResolver().query(FavouritesContract.FavouritesEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE,
+                            null);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mLoadingBar.setVisibility(View.INVISIBLE);
+        if (data != null){
+            Movie[] movies = FavouritesCursorUtils.convertCursorDataToMovies(data);
+            mCurrentMovies = movies;
+            showMovieView();
+            mMoviesAdapter.setMovieData(movies);
+        } else {
+            showErrorView();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
 
