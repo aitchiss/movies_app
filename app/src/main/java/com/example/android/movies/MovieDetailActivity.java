@@ -3,6 +3,7 @@ package com.example.android.movies;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -115,7 +116,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void getTrailerInfo(){
-
+//      Only load trailer details via network call if online
         if (NetworkUtils.isOnlineOrConnecting(this)){
             // Create a query bundle for Loader to get trailer details
             Bundle trailerQueryBundle = new Bundle();
@@ -128,6 +129,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void getReviewInfo(){
+//        Only load review details via network call if online
         if (NetworkUtils.isOnlineOrConnecting(this)){
             // Create a query bundle for Loader to get review details
             Bundle reviewQueryBundle = new Bundle();
@@ -179,8 +181,12 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     public void onFavouritesClick(View view) {
-//        On Favourites button click, add the movie to the Favourites db
-//        TODO ALTER THIS SO THAT IT DOESN'T PUT DUPLICATES IN THE DB
+//        On Favourites button click, add the movie to the Favourites db, unless it's already in there
+        if (isAlreadyInFavourites()){
+//            todo - change to removing from favourites... set up text view to reflect action
+            Toast.makeText(getBaseContext(), R.string.already_in_favourites, Toast.LENGTH_LONG).show();
+            return;
+        }
         ContentValues contentValues = new ContentValues();
         contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, mCurrentMovie.getId());
         contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, mCurrentMovie.getTitle());
@@ -193,6 +199,17 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
         if (uri != null) {
             Toast.makeText(getBaseContext(), R.string.added_to_favourites_conf, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public boolean isAlreadyInFavourites(){
+//        Check if the movie is already in the Favourites database
+        Uri uri = FavouritesContract.FavouritesEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(mCurrentMovie.getId())).build();
+        Cursor resultsCursor = getContentResolver().query(uri, null, null, null, null);
+        if (resultsCursor.getCount() > 0){
+            return true;
+        } else {
+            return false;
         }
     }
 

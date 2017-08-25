@@ -24,6 +24,8 @@ public class FavouritesContentProvider extends ContentProvider {
     public static final int FAVOURITES = 100;
     public static final int FAVOURITES_WITH_ID = 101;
 
+    private static final String MOVIE_ID_SELECTION = FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID + "=?";
+
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     public static UriMatcher buildUriMatcher(){
@@ -58,7 +60,18 @@ public class FavouritesContentProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-
+                break;
+            case FAVOURITES_WITH_ID:
+                String movieId = uri.getPathSegments().get(1);
+                String mSelection = MOVIE_ID_SELECTION;
+                String[] mSelectionArgs = new String[]{movieId};
+                returnCursor = db.query(FavouritesContract.FavouritesEntry.TABLE_NAME,
+                        projection,
+                        mSelection,
+                        mSelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
