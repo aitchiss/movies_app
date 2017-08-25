@@ -1,11 +1,8 @@
 package com.example.android.movies;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -57,6 +54,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     private ImageView mPoster;
     private TextView mFavouritesText;
     private ImageView mFavouritesIcon;
+    private LinearLayout mTrailerLoadingError;
+    private LinearLayout mReviewLoadingError;
 
     private Trailer[] mTrailers;
     private TrailersAdapter mTrailersAdapter;
@@ -87,6 +86,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         mPoster = (ImageView) findViewById(R.id.iv_movie_poster);
         mFavouritesText = (TextView) findViewById(R.id.tv_favourites_text);
         mFavouritesIcon = (ImageView) findViewById(R.id.iv_favourite_icon);
+        mTrailerLoadingError = (LinearLayout) findViewById(R.id.trailer_loading_error);
+        mReviewLoadingError = (LinearLayout) findViewById(R.id.review_loading_error);
 
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
@@ -145,7 +146,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             trailerQueryBundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
             initOrRestartLoader(trailerQueryBundle, TRAILER_DETAILS_LOADER);
         } else {
-//            TODO - ADD AN ERROR MESSAGE FOR WHEN TRAILERS CANT BE LOADED
+            mTrailerLoadingError.setVisibility(View.VISIBLE);
         }
 
     }
@@ -159,11 +160,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             initOrRestartLoader(reviewQueryBundle, REVIEW_DETAILS_LOADER);
 
         } else {
-//            TODO - ADD AN ERROR MESSAGE FOR WHEN REVIEWS CANT BE LOADED
+            mReviewLoadingError.setVisibility(View.VISIBLE);
         }
     }
 
-//    TODO - NEEDS REFACTORED/TIDIED UP
     private void initOrRestartLoader(Bundle bundle, int loaderId){
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader loader = loaderManager.getLoader(loaderId);
@@ -254,7 +254,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     }
 
 
-//todo? move to own class file
     public class IntegerLoaderCallbacks implements LoaderManager.LoaderCallbacks<Integer>{
 
         @Override
@@ -275,32 +274,37 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
                     String movieId = String.valueOf(args.getInt(MOVIE_ID_EXTRA));
 //                    To update the UI, we need to know that the requested update has been made to at least one matching row
                     int updatedRows;
-//todo - prob need some try/catch here
-                    switch(id){
-                        case FAVOURITES_DELETE_LOADER:
-                            Uri uri = FavouritesContract.FavouritesEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-                            updatedRows = getContentResolver().delete(uri,null, null);
-                            break;
-                        case FAVOURITES_INSERT_LOADER:
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, args.getInt(MOVIE_ID_EXTRA));
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, args.getString(MOVIE_TITLE_EXTRA));
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH, args.getString(MOVIE_POSTER_EXTRA));
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RATING, args.getString(MOVIE_RATING_EXTRA));
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE, args.getString(MOVIE_RELEASE_EXTRA));
-                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_SYNOPSIS, args.getString(MOVIE_SYNOPSIS_EXTRA));
+                    try {
+                        switch(id){
+                            case FAVOURITES_DELETE_LOADER:
+                                Uri uri = FavouritesContract.FavouritesEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
+                                updatedRows = getContentResolver().delete(uri,null, null);
+                                break;
+                            case FAVOURITES_INSERT_LOADER:
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, args.getInt(MOVIE_ID_EXTRA));
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, args.getString(MOVIE_TITLE_EXTRA));
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH, args.getString(MOVIE_POSTER_EXTRA));
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RATING, args.getString(MOVIE_RATING_EXTRA));
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE, args.getString(MOVIE_RELEASE_EXTRA));
+                                contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_SYNOPSIS, args.getString(MOVIE_SYNOPSIS_EXTRA));
 
-                            Uri returnUri = getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
+                                Uri returnUri = getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
 
-                            if (returnUri != null) {
-                                updatedRows =  1;
-                            } else {
+                                if (returnUri != null) {
+                                    updatedRows =  1;
+                                } else {
+                                    updatedRows = 0;
+                                }
+                                break;
+                            default:
                                 updatedRows = 0;
-                            }
-                            break;
-                        default:
-                            updatedRows = 0;
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        updatedRows = 0;
                     }
+
                     return updatedRows;
                 }
             };
@@ -328,7 +332,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         }
     }
 
-//TODO - MOVE TO OWN CLASS FILE
     public class StringLoaderCallbacks implements LoaderManager.LoaderCallbacks<String>{
 
         @Override
@@ -384,8 +387,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             try {
                 if (loader.getId() == TRAILER_DETAILS_LOADER){
                     mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
+                    mTrailerLoadingError.setVisibility(View.INVISIBLE);
                     mTrailersAdapter.setTrailerData(mTrailers);
                 } else if (loader.getId() == REVIEW_DETAILS_LOADER){
+                    mReviewLoadingError.setVisibility(View.INVISIBLE);
                     mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
                     mReviewsAdapter.setReviewData(mReviews);
                 }
@@ -393,7 +398,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             } catch (JSONException e){
                 e.printStackTrace();
             }
-
         }
 
         @Override
