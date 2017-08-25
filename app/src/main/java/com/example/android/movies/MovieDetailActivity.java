@@ -10,15 +10,14 @@ import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,14 +33,21 @@ import java.io.IOException;
 import java.net.URL;
 
 
-public class MovieDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>, TrailersAdapter.TrailerClickHandler {
+public class MovieDetailActivity extends AppCompatActivity implements TrailersAdapter.TrailerClickHandler {
 
     private static String apiKey;
 
     private static final String MOVIE = "movie";
     private static final int TRAILER_DETAILS_LOADER = 101;
     private static final int REVIEW_DETAILS_LOADER = 102;
+    private static final int FAVOURITES_DELETE_LOADER = 103;
+    private static final int FAVOURITES_INSERT_LOADER = 104;
     private static final String MOVIE_ID_EXTRA = "movieId";
+    private static final String MOVIE_TITLE_EXTRA = "movieTitle";
+    private static final String MOVIE_POSTER_EXTRA = "moviePoster";
+    private static final String MOVIE_RELEASE_EXTRA = "movieRelease";
+    private static final String MOVIE_RATING_EXTRA = "movieRating";
+    private static final String MOVIE_SYNOPSIS_EXTRA = "movieSynopsis";
 
     private Movie mCurrentMovie;
     private TextView mTitle;
@@ -49,6 +55,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     private TextView mReleaseDate;
     private TextView mRating;
     private ImageView mPoster;
+    private TextView mFavouritesText;
+    private ImageView mFavouritesIcon;
 
     private Trailer[] mTrailers;
     private TrailersAdapter mTrailersAdapter;
@@ -77,6 +85,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         mReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
         mRating = (TextView) findViewById(R.id.tv_movie_rating);
         mPoster = (ImageView) findViewById(R.id.iv_movie_poster);
+        mFavouritesText = (TextView) findViewById(R.id.tv_favourites_text);
+        mFavouritesIcon = (ImageView) findViewById(R.id.iv_favourite_icon);
 
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
@@ -88,6 +98,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
             populateMovieDetails();
             getTrailerInfo();
             getReviewInfo();
+            updateFavouritesView();
 
         } else {
             movieDetailsLayout.setVisibility(View.INVISIBLE);
@@ -96,6 +107,17 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
         setUpTrailersAdapter();
         setUpReviewsAdapter();
+    }
+
+//    Checks if the current movie is already in favourites, and offers delete option if it is, and add to faves option if not
+    private void updateFavouritesView(){
+        if (isAlreadyInFavourites()){
+            mFavouritesText.setText(R.string.remove_from_favourites);
+            mFavouritesIcon.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_star_favourited, null));
+        } else {
+            mFavouritesText.setText(R.string.add_to_favourites);
+            mFavouritesIcon.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_star, null));
+        }
     }
 
     private void populateMovieDetails(){
@@ -141,13 +163,24 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         }
     }
 
+//    TODO - NEEDS REFACTORED/TIDIED UP
     private void initOrRestartLoader(Bundle bundle, int loaderId){
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> loader = loaderManager.getLoader(loaderId);
+        Loader loader = loaderManager.getLoader(loaderId);
+
         if (loader == null){
-            loaderManager.initLoader(loaderId, bundle, this);
+            if (loaderId == FAVOURITES_DELETE_LOADER || loaderId == FAVOURITES_INSERT_LOADER){
+                loaderManager.initLoader(loaderId, bundle, new IntegerLoaderCallbacks());
+            } else {
+                loaderManager.initLoader(loaderId, bundle, new StringLoaderCallbacks());
+            }
+
         } else {
-            loaderManager.restartLoader(loaderId, bundle, this);
+            if (loaderId == FAVOURITES_DELETE_LOADER || loaderId == FAVOURITES_INSERT_LOADER){
+                loaderManager.restartLoader(loaderId, bundle, new IntegerLoaderCallbacks());
+            } else {
+                loaderManager.restartLoader(loaderId, bundle, new StringLoaderCallbacks());
+            }
         }
     }
 
@@ -181,25 +214,32 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     public void onFavouritesClick(View view) {
-//        On Favourites button click, add the movie to the Favourites db, unless it's already in there
+//        On Favourites button click, either add or remove the movie from the Favourites DB
         if (isAlreadyInFavourites()){
-//            todo - change to removing from favourites... set up text view to reflect action
-            Toast.makeText(getBaseContext(), R.string.already_in_favourites, Toast.LENGTH_LONG).show();
-            return;
+            removeFromFavourites();
+        } else {
+            addToFavourites();
         }
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, mCurrentMovie.getId());
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, mCurrentMovie.getTitle());
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH, mCurrentMovie.getPosterPath());
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RATING, mCurrentMovie.getRating());
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE, mCurrentMovie.getReleaseDate());
-        contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_SYNOPSIS, mCurrentMovie.getSynopsis());
 
-        Uri uri = getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
+    }
 
-        if (uri != null) {
-            Toast.makeText(getBaseContext(), R.string.added_to_favourites_conf, Toast.LENGTH_LONG).show();
-        }
+    public void removeFromFavourites(){
+        Bundle bundle = new Bundle();
+        bundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
+        initOrRestartLoader(bundle, FAVOURITES_DELETE_LOADER);
+    }
+
+    public void addToFavourites(){
+
+        Bundle bundle = new Bundle();
+        bundle.putInt(MOVIE_ID_EXTRA, mCurrentMovie.getId());
+        bundle.putString(MOVIE_TITLE_EXTRA, mCurrentMovie.getTitle());
+        bundle.putString(MOVIE_POSTER_EXTRA, mCurrentMovie.getPosterPath());
+        bundle.putString(MOVIE_RATING_EXTRA, mCurrentMovie.getRating());
+        bundle.putString(MOVIE_RELEASE_EXTRA, mCurrentMovie.getReleaseDate());
+        bundle.putString(MOVIE_SYNOPSIS_EXTRA, mCurrentMovie.getSynopsis());
+
+        initOrRestartLoader(bundle, FAVOURITES_INSERT_LOADER);
     }
 
     public boolean isAlreadyInFavourites(){
@@ -214,73 +254,155 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
 
-    @Override
-    public Loader<String> onCreateLoader(final int id, final Bundle args) {
-        return new AsyncTaskLoader<String>(this) {
+//todo? move to own class file
+    public class IntegerLoaderCallbacks implements LoaderManager.LoaderCallbacks<Integer>{
 
-            @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
-                if (args == null){
-                    return;
+        @Override
+        public Loader<Integer> onCreateLoader(final int id, final Bundle args) {
+            return new AsyncTaskLoader<Integer>(getBaseContext()) {
+
+                @Override
+                protected void onStartLoading() {
+                    super.onStartLoading();
+                    if (args == null){
+                        return;
+                    }
+                    forceLoad();
                 }
-                forceLoad();
+
+                @Override
+                public Integer loadInBackground() {
+                    String movieId = String.valueOf(args.getInt(MOVIE_ID_EXTRA));
+//                    To update the UI, we need to know that the requested update has been made to at least one matching row
+                    int updatedRows;
+//todo - prob need some try/catch here
+                    switch(id){
+                        case FAVOURITES_DELETE_LOADER:
+                            Uri uri = FavouritesContract.FavouritesEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
+                            updatedRows = getContentResolver().delete(uri,null, null);
+                            break;
+                        case FAVOURITES_INSERT_LOADER:
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID, args.getInt(MOVIE_ID_EXTRA));
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_TITLE, args.getString(MOVIE_TITLE_EXTRA));
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_POSTER_PATH, args.getString(MOVIE_POSTER_EXTRA));
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RATING, args.getString(MOVIE_RATING_EXTRA));
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_RELEASE_DATE, args.getString(MOVIE_RELEASE_EXTRA));
+                            contentValues.put(FavouritesContract.FavouritesEntry.COLUMN_MOVIE_SYNOPSIS, args.getString(MOVIE_SYNOPSIS_EXTRA));
+
+                            Uri returnUri = getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
+
+                            if (returnUri != null) {
+                                updatedRows =  1;
+                            } else {
+                                updatedRows = 0;
+                            }
+                            break;
+                        default:
+                            updatedRows = 0;
+                    }
+                    return updatedRows;
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Integer> loader, Integer data) {
+
+            if (data <= 0 || data == null){
+                return;
+            }
+//            As long as at least one row has been updated, reflect the update (deletion or insertion) in the UI
+            if (loader.getId() == FAVOURITES_DELETE_LOADER){
+                updateFavouritesView();
+                Toast.makeText(getBaseContext(), R.string.confirm_fav_deleted, Toast.LENGTH_LONG).show();
+            } else if (loader.getId() == FAVOURITES_INSERT_LOADER){
+                Toast.makeText(getBaseContext(), R.string.added_to_favourites_conf, Toast.LENGTH_LONG).show();
+                updateFavouritesView();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Integer> loader) {
+
+        }
+    }
+
+//TODO - MOVE TO OWN CLASS FILE
+    public class StringLoaderCallbacks implements LoaderManager.LoaderCallbacks<String>{
+
+        @Override
+        public Loader<String> onCreateLoader(final int id, final Bundle args) {
+            return new AsyncTaskLoader<String>(getBaseContext()) {
+
+                @Override
+                protected void onStartLoading() {
+                    super.onStartLoading();
+                    if (args == null){
+                        return;
+                    }
+                    forceLoad();
 //                TODO CONSIDER SETTING A LOADING INDICATOR FOR THIS VIEW
-            }
-
-            @Override
-            public String loadInBackground() {
-                int movieId = args.getInt(MOVIE_ID_EXTRA);
-                URL url;
-
-                switch(id){
-                    case TRAILER_DETAILS_LOADER:
-                        url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
-                        break;
-                    case REVIEW_DETAILS_LOADER:
-                        url = NetworkUtils.buildReviewUrl(apiKey, movieId);
-                        break;
-                    default:
-                        url = null;
                 }
 
-                if (movieId < 0){
-                    return null;
-                }
-                try {
-                    String results = NetworkUtils.getResponseFromHttpUrl(url);
-                    return results;
-                } catch (IOException e){
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        };
-    }
+                @Override
+                public String loadInBackground() {
+                    int movieId = args.getInt(MOVIE_ID_EXTRA);
+                    URL url;
 
-    @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
-        if (data == null){
-            return;
+                    switch(id){
+                        case TRAILER_DETAILS_LOADER:
+                            url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
+                            break;
+                        case REVIEW_DETAILS_LOADER:
+                            url = NetworkUtils.buildReviewUrl(apiKey, movieId);
+                            break;
+                        default:
+                            url = null;
+                    }
+
+                    if (movieId < 0){
+                        return null;
+                    }
+                    try {
+                        String results = NetworkUtils.getResponseFromHttpUrl(url);
+                        return results;
+                    } catch (IOException e){
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+            };
         }
 
-        try {
-            if (loader.getId() == TRAILER_DETAILS_LOADER){
-                mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
-                mTrailersAdapter.setTrailerData(mTrailers);
-            } else if (loader.getId() == REVIEW_DETAILS_LOADER){
-                mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
-                mReviewsAdapter.setReviewData(mReviews);
+        @Override
+        public void onLoadFinished(Loader<String> loader, String data) {
+            if (data == null){
+                return;
             }
 
-        } catch (JSONException e){
-            e.printStackTrace();
+            try {
+                if (loader.getId() == TRAILER_DETAILS_LOADER){
+                    mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
+                    mTrailersAdapter.setTrailerData(mTrailers);
+                } else if (loader.getId() == REVIEW_DETAILS_LOADER){
+                    mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
+                    mReviewsAdapter.setReviewData(mReviews);
+                }
+
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+
         }
 
+        @Override
+        public void onLoaderReset(Loader<String> loader) {
+
+        }
+
+
     }
 
-    @Override
-    public void onLoaderReset(Loader<String> loader) {
 
-    }
 }
