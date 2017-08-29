@@ -10,5 +10,73 @@
         <item name="android:background">@color/colorBackground</item>
     </style>
 
+    <style name="ListHeaders">
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">13dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="PosterDetailsView">
+        <item name="android:layout_width">175dp</item>
+        <item name="android:layout_height">250dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:contentDescription">@string/iv_alt_poster</item>
+    </style>
+
+    <style name="FieldLabels">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="MovieDetailLarge">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="MovieDetailNormal">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="MovieTitleHeader">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:padding">30dp</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="FavouritesIcon">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:background">@drawable/ic_star</item>
+        <item name="android:backgroundTint">@color/colorAccent</item>
+        <item name="android:onClick">onFavouritesClick</item>
+    </style>
+
+    <style name="FavouritesInfoText">
+        <item name="android:onClick">onFavouritesClick</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="SectionDivider" parent="BaseDivider">
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+    </style>
+
+    <style name="BaseDivider">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
 
 </resources>

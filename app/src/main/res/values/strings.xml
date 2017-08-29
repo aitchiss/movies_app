@@ -16,4 +16,6 @@
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="confirm_fav_deleted">Removed from favourites</string>
+    <string name="no_trailers_available">No trailers available to show</string>
+    <string name="no_reviews_available">No reviews available to show</string>
 </resources>

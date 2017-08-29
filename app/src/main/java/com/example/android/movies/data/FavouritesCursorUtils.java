@@ -33,7 +33,6 @@ public class FavouritesCursorUtils {
             String releaseDate = cursor.getString(releaseDateColumn);
 
             Movie movie = new Movie(title, posterPath, synopsis, releaseDate, rating, movieId);
-//            TODO MOVIE ID AND RATING SHOULD BE INTS WHEN SAVED TO DB - EDIT
             movies[i] = movie;
         }
 

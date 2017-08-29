@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private static final String MOVIE = "movie";
 
     private static final int FAVOURITES_LOADER_ID = 10;
+    private static final int MOVIES_LOADER_ID = 11;
 
     private String apiKey;
     private RecyclerView mMovieRecyclerView;
@@ -141,8 +142,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 //        only attempt to load movies if device is online or connecting to internet
         if (NetworkUtils.isOnlineOrConnecting(this)){
             mLoadingBar.setVisibility(View.VISIBLE);
-            URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
-            new FetchMoviesTask().execute(url);
+//            URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
+            LoaderManager loaderManager = getSupportLoaderManager();
+            Loader loader = loaderManager.getLoader(MOVIES_LOADER_ID);
+            if (loader == null){
+                loaderManager.initLoader(MOVIES_LOADER_ID, null, new MovieLoaderCallbacks());
+            } else {
+                loaderManager.restartLoader(MOVIES_LOADER_ID, null, new MovieLoaderCallbacks());
+            }
         } else {
             showErrorView();
         }
@@ -237,30 +244,50 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
 
-    private class FetchMoviesTask extends AsyncTask<URL, Void, Movie[]>{
+//    Handles the callbacks for grabbing the list of movies
+    private class MovieLoaderCallbacks implements LoaderManager.LoaderCallbacks<Movie[]>{
 
         @Override
-        protected Movie[] doInBackground(URL... params) {
-            URL url = params[0];
-            Movie[] parsedMovieDetails = null;
-            try {
-                String movieResults = NetworkUtils.getResponseFromHttpUrl(url);
-                parsedMovieDetails = MovieDbJsonUtils.convertJsonToMovies(movieResults);
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-            return parsedMovieDetails;
+        public Loader<Movie[]> onCreateLoader(int id, final Bundle args) {
+            return new AsyncTaskLoader<Movie[]>(getBaseContext()) {
+
+                @Override
+                protected void onStartLoading() {
+                    super.onStartLoading();
+                    forceLoad();
+                }
+
+                @Override
+                public Movie[] loadInBackground() {
+                    URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
+                    Movie[] parsedMovieDetails = null;
+                    try {
+                        String movieResults = NetworkUtils.getResponseFromHttpUrl(url);
+                        parsedMovieDetails = MovieDbJsonUtils.convertJsonToMovies(movieResults);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    return parsedMovieDetails;
+                }
+            };
         }
 
         @Override
-        protected void onPostExecute(Movie[] movieDetails) {
-            if (movieDetails != null){
-                mCurrentMovies = movieDetails;
+        public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
+            if (data != null){
+                mCurrentMovies = data;
                 showMovieView();
-                mMoviesAdapter.setMovieData(movieDetails);
+                mMoviesAdapter.setMovieData(data);
             } else {
                 showErrorView();
             }
         }
+
+        @Override
+        public void onLoaderReset(Loader<Movie[]> loader) {
+
+        }
     }
+
+
 }

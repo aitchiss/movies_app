@@ -58,7 +58,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     public void setMovieData(Movie[] movieData){
         mMovieData = movieData;
-        Log.d("setting movies", String.valueOf(mMovieData.length));
         notifyDataSetChanged();
     }
 

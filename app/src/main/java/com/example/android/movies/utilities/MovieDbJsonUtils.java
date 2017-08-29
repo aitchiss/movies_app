@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 public class MovieDbJsonUtils {
 
-//    TODO COMBINE THESE FUNCTIONS TO REMOVE DUPLICATION
 
     public static Movie[] convertJsonToMovies(String jsonMovieDataString) throws JSONException{
 

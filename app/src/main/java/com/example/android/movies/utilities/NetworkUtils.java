@@ -71,7 +71,6 @@ public class NetworkUtils {
     }
 
     public static URL buildReviewUrl(String apiKey, int movieId){
-//        TODO REFACTOR OUT DUPLICATION IN BUILDING URLS
         Uri builtUri = Uri.parse(BASE_API_URL).buildUpon()
                 .appendPath(String.valueOf(movieId))
                 .appendPath(REVIEW_PATH)

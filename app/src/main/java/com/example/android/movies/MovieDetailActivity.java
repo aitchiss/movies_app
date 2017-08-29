@@ -61,6 +61,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     private ImageView mFavouritesIcon;
     private LinearLayout mTrailerLoadingError;
     private LinearLayout mReviewLoadingError;
+    private TextView mEmptyTrailers;
+    private TextView mEmptyReviews;
 
     private Trailer[] mTrailers;
     private TrailersAdapter mTrailersAdapter;
@@ -93,25 +95,26 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         mFavouritesIcon = (ImageView) findViewById(R.id.iv_favourite_icon);
         mTrailerLoadingError = (LinearLayout) findViewById(R.id.trailer_loading_error);
         mReviewLoadingError = (LinearLayout) findViewById(R.id.review_loading_error);
+        mEmptyReviews = (TextView) findViewById(R.id.tv_empty_reviews);
+        mEmptyTrailers = (TextView) findViewById(R.id.tv_empty_trailers);
 
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
 
-
+//       Set up the adapters
         setUpTrailersAdapter();
         setUpReviewsAdapter();
 
-
+//      Restore from saved instance state, or from the intent which launched activity
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE)){
             mCurrentMovie = savedInstanceState.getParcelable(MOVIE);
             mReviews = (Review[]) savedInstanceState.getParcelableArray(REVIEWS);
             mTrailers = (Trailer[]) savedInstanceState.getParcelableArray(TRAILERS);
             populateMovieDetails();
             updateFavouritesView();
-            mReviewsAdapter.setReviewData(mReviews);
-            mTrailersAdapter.setTrailerData(mTrailers);
-
+            populateReviews();
+            populateTrailers();
         } else {
             //        Populate the movie details if possible, otherwise show the error view
             if (b.getParcelable(MOVIE) != null){
@@ -120,13 +123,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
                 getTrailerInfo();
                 getReviewInfo();
                 updateFavouritesView();
-
             } else {
                 movieDetailsLayout.setVisibility(View.INVISIBLE);
                 movieDetailsErrorLayout.setVisibility(View.VISIBLE);
             }
         }
-
 
     }
 
@@ -157,6 +158,25 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         mReleaseDate.setText(mCurrentMovie.getReleaseDate());
         mRating.setText(getString(R.string.rating_score, mCurrentMovie.getRating()));
         populatePoster();
+    }
+
+    private void populateTrailers(){
+        if (mTrailers.length > 0){
+            mEmptyTrailers.setVisibility(View.INVISIBLE);
+            mTrailersAdapter.setTrailerData(mTrailers);
+        } else {
+            mEmptyTrailers.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    private void populateReviews(){
+        if (mReviews.length > 0){
+            mEmptyReviews.setVisibility(View.INVISIBLE);
+            mReviewsAdapter.setReviewData(mReviews);
+        } else {
+            mEmptyReviews.setVisibility(View.VISIBLE);
+        }
     }
 
     private void populatePoster(){
@@ -417,11 +437,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
                 if (loader.getId() == TRAILER_DETAILS_LOADER && data != null){
                     mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
                     mTrailerLoadingError.setVisibility(View.INVISIBLE);
-                    mTrailersAdapter.setTrailerData(mTrailers);
+                    populateTrailers();
                 } else if (loader.getId() == REVIEW_DETAILS_LOADER && data != null){
                     mReviewLoadingError.setVisibility(View.INVISIBLE);
                     mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
-                    mReviewsAdapter.setReviewData(mReviews);
+                    populateReviews();
                 }
 
             } catch (JSONException e){

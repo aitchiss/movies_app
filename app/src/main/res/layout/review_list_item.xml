@@ -21,9 +21,8 @@
 
     <TextView
         android:id="@+id/tv_review_content"
+        style="@style/MovieDetailNormal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
         tools:text="To be honest, I thought it was pretty average"
         android:layout_marginTop="5dp"
         app:layout_constraintTop_toBottomOf="@+id/tv_review_author"
@@ -35,9 +34,7 @@
 
     <ImageView
         android:id="@+id/iv_review_divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/colorPrimary"
+        style="@style/BaseDivider"
         android:layout_marginTop="14dp"
         app:layout_constraintTop_toBottomOf="@+id/tv_review_content"
         app:layout_constraintLeft_toLeftOf="parent"
