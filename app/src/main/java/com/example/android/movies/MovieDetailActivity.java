@@ -94,7 +94,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         mTrailerLoadingError = (LinearLayout) findViewById(R.id.trailer_loading_error);
         mReviewLoadingError = (LinearLayout) findViewById(R.id.review_loading_error);
 
-        Log.d("state", "create");
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
@@ -112,7 +111,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             updateFavouritesView();
             mReviewsAdapter.setReviewData(mReviews);
             mTrailersAdapter.setTrailerData(mTrailers);
-            Log.d("state", "received parcelable");
 
         } else {
             //        Populate the movie details if possible, otherwise show the error view
@@ -416,11 +414,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
             }
 
             try {
-                if (loader.getId() == TRAILER_DETAILS_LOADER){
+                if (loader.getId() == TRAILER_DETAILS_LOADER && data != null){
                     mTrailers = MovieDbJsonUtils.convertJsonToTrailers(data);
                     mTrailerLoadingError.setVisibility(View.INVISIBLE);
                     mTrailersAdapter.setTrailerData(mTrailers);
-                } else if (loader.getId() == REVIEW_DETAILS_LOADER){
+                } else if (loader.getId() == REVIEW_DETAILS_LOADER && data != null){
                     mReviewLoadingError.setVisibility(View.INVISIBLE);
                     mReviews = MovieDbJsonUtils.convertJsonToReviews(data);
                     mReviewsAdapter.setReviewData(mReviews);
