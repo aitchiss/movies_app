@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.PersistableBundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +37,9 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     private static String apiKey;
 
     private static final String MOVIE = "movie";
+    private static final String TRAILERS = "trailers";
+    private static final String REVIEWS = "reviews";
+
     private static final int TRAILER_DETAILS_LOADER = 101;
     private static final int REVIEW_DETAILS_LOADER = 102;
     private static final int FAVOURITES_DELETE_LOADER = 103;
@@ -89,28 +94,55 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
         mTrailerLoadingError = (LinearLayout) findViewById(R.id.trailer_loading_error);
         mReviewLoadingError = (LinearLayout) findViewById(R.id.review_loading_error);
 
+        Log.d("state", "create");
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
 
-//        Populate the movie details if possible, otherwise show the error view
-        if (b.getParcelable(MOVIE) != null){
-            mCurrentMovie = b.getParcelable(MOVIE);
-            populateMovieDetails();
-            getTrailerInfo();
-            getReviewInfo();
-            updateFavouritesView();
-
-        } else {
-            movieDetailsLayout.setVisibility(View.INVISIBLE);
-            movieDetailsErrorLayout.setVisibility(View.VISIBLE);
-        }
 
         setUpTrailersAdapter();
         setUpReviewsAdapter();
+
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE)){
+            mCurrentMovie = savedInstanceState.getParcelable(MOVIE);
+            mReviews = (Review[]) savedInstanceState.getParcelableArray(REVIEWS);
+            mTrailers = (Trailer[]) savedInstanceState.getParcelableArray(TRAILERS);
+            populateMovieDetails();
+            updateFavouritesView();
+            mReviewsAdapter.setReviewData(mReviews);
+            mTrailersAdapter.setTrailerData(mTrailers);
+            Log.d("state", "received parcelable");
+
+        } else {
+            //        Populate the movie details if possible, otherwise show the error view
+            if (b.getParcelable(MOVIE) != null){
+                mCurrentMovie = b.getParcelable(MOVIE);
+                populateMovieDetails();
+                getTrailerInfo();
+                getReviewInfo();
+                updateFavouritesView();
+
+            } else {
+                movieDetailsLayout.setVisibility(View.INVISIBLE);
+                movieDetailsErrorLayout.setVisibility(View.VISIBLE);
+            }
+        }
+
+
     }
 
-//    Checks if the current movie is already in favourites, and offers delete option if it is, and add to faves option if not
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(MOVIE, mCurrentMovie);
+        outState.putParcelableArray(TRAILERS, mTrailers);
+        outState.putParcelableArray(REVIEWS, mReviews);
+
+        super.onSaveInstanceState(outState);
+    }
+
+
+    //    Checks if the current movie is already in favourites, and offers delete option if it is, and add to faves option if not
     private void updateFavouritesView(){
         if (isAlreadyInFavourites()){
             mFavouritesText.setText(R.string.remove_from_favourites);
@@ -345,7 +377,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
                         return;
                     }
                     forceLoad();
-//                TODO CONSIDER SETTING A LOADING INDICATOR FOR THIS VIEW
                 }
 
                 @Override
