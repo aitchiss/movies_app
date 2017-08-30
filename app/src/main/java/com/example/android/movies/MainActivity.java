@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.LoaderManager;
@@ -77,7 +78,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMovieRecyclerView.setAdapter(mMoviesAdapter);
 //        Retain current list of movies without making another network call
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIES)){
-            mCurrentMovies = (Movie[]) savedInstanceState.getParcelableArray(MOVIES);
+            int numberOfMovies = savedInstanceState.getParcelableArray(MOVIES).length;
+            mCurrentMovies = new Movie[numberOfMovies];
+            for (int i= 0; i < numberOfMovies; i++ ){
+                Movie movie = (Movie) savedInstanceState.getParcelableArray(MOVIES)[i];
+                mCurrentMovies[i] = movie;
+            }
             showMovieView();
             mMoviesAdapter.setMovieData(mCurrentMovies);
             mSortOption = savedInstanceState.getString(SORT_OPTION);

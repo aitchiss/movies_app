@@ -97,8 +97,24 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
 //      Restore from saved instance state, or from the intent which launched activity
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE)){
             mCurrentMovie = savedInstanceState.getParcelable(MOVIE);
-            mReviews = (Review[]) savedInstanceState.getParcelableArray(REVIEWS);
-            mTrailers = (Trailer[]) savedInstanceState.getParcelableArray(TRAILERS);
+
+//            Restore the reviews
+            int numberOfReviews = savedInstanceState.getParcelableArray(REVIEWS).length;
+            mReviews = new Review[numberOfReviews];
+            for (int i= 0; i < numberOfReviews; i++ ){
+                Review review = (Review) savedInstanceState.getParcelableArray(REVIEWS)[i];
+                mReviews[i] = review;
+            }
+
+//            Restore the trailers
+            int numberOfTrailers = savedInstanceState.getParcelableArray(TRAILERS).length;
+            mTrailers = new Trailer[numberOfTrailers];
+            for (int i= 0; i < numberOfTrailers; i++ ){
+                Trailer trailer = (Trailer) savedInstanceState.getParcelableArray(TRAILERS)[i];
+                mTrailers[i] = trailer;
+            }
+
+//            Populate the screen
             populateMovieDetails();
             updateFavouritesView();
             populateReviews();
