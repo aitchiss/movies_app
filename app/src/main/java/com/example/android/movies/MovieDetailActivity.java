@@ -31,19 +31,16 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class MovieDetailActivity extends AppCompatActivity implements TrailersAdapter.TrailerClickHandler {
-
-    private static String apiKey;
 
     private static final String MOVIE = "movie";
     private static final String TRAILERS = "trailers";
     private static final String REVIEWS = "reviews";
-
-    private static final int TRAILER_DETAILS_LOADER = 101;
-    private static final int REVIEW_DETAILS_LOADER = 102;
-    private static final int FAVOURITES_DELETE_LOADER = 103;
-    private static final int FAVOURITES_INSERT_LOADER = 104;
     private static final String MOVIE_ID_EXTRA = "movieId";
     private static final String MOVIE_TITLE_EXTRA = "movieTitle";
     private static final String MOVIE_POSTER_EXTRA = "moviePoster";
@@ -51,25 +48,31 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     private static final String MOVIE_RATING_EXTRA = "movieRating";
     private static final String MOVIE_SYNOPSIS_EXTRA = "movieSynopsis";
 
+    private static final int TRAILER_DETAILS_LOADER = 101;
+    private static final int REVIEW_DETAILS_LOADER = 102;
+    private static final int FAVOURITES_DELETE_LOADER = 103;
+    private static final int FAVOURITES_INSERT_LOADER = 104;
+
+    @BindString(R.string.my_api_key) String mApiKey;
+
+    @BindView(R.id.tv_movie_title) TextView mTitle;
+    @BindView(R.id.tv_movie_synopsis) TextView mSynopsis;
+    @BindView(R.id.tv_movie_release_date) TextView mReleaseDate;
+    @BindView(R.id.tv_movie_rating) TextView mRating;
+    @BindView(R.id.iv_movie_poster) ImageView mPoster;
+    @BindView(R.id.tv_favourites_text) TextView mFavouritesText;
+    @BindView(R.id.iv_favourite_icon) ImageView mFavouritesIcon;
+    @BindView(R.id.trailer_loading_error) LinearLayout mTrailerLoadingError;
+    @BindView(R.id.review_loading_error) LinearLayout mReviewLoadingError;
+    @BindView(R.id.tv_empty_reviews) TextView mEmptyTrailers;
+    @BindView(R.id.tv_empty_trailers) TextView mEmptyReviews;
+    @BindView(R.id.recyclerview_trailers_list) RecyclerView mTrailersRecyclerView;
+    @BindView(R.id.recyclerview_reviews_list) RecyclerView mReviewsRecyclerView;
+
     private Movie mCurrentMovie;
-    private TextView mTitle;
-    private TextView mSynopsis;
-    private TextView mReleaseDate;
-    private TextView mRating;
-    private ImageView mPoster;
-    private TextView mFavouritesText;
-    private ImageView mFavouritesIcon;
-    private LinearLayout mTrailerLoadingError;
-    private LinearLayout mReviewLoadingError;
-    private TextView mEmptyTrailers;
-    private TextView mEmptyReviews;
-
     private Trailer[] mTrailers;
-    private TrailersAdapter mTrailersAdapter;
-    private RecyclerView mTrailersRecyclerView;
-
     private Review[] mReviews;
-    private RecyclerView mReviewsRecyclerView;
+    private TrailersAdapter mTrailersAdapter;
     private ReviewsAdapter mReviewsAdapter;
 
 
@@ -77,26 +80,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-
-        //      Retrieve key String from secrets values resource
-        apiKey = getString(R.string.my_api_key);
+        ButterKnife.bind(this);
 
 //        Get a reference to the error layout and standard layout
         LinearLayout movieDetailsErrorLayout = (LinearLayout) findViewById(R.id.layout_movie_details_error);
         ScrollView movieDetailsLayout = (ScrollView) findViewById(R.id.layout_movie_details);
-
-//        Get a reference to all of the TextViews and ImageView
-        mTitle = (TextView) findViewById(R.id.tv_movie_title);
-        mSynopsis = (TextView) findViewById(R.id.tv_movie_synopsis);
-        mReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
-        mRating = (TextView) findViewById(R.id.tv_movie_rating);
-        mPoster = (ImageView) findViewById(R.id.iv_movie_poster);
-        mFavouritesText = (TextView) findViewById(R.id.tv_favourites_text);
-        mFavouritesIcon = (ImageView) findViewById(R.id.iv_favourite_icon);
-        mTrailerLoadingError = (LinearLayout) findViewById(R.id.trailer_loading_error);
-        mReviewLoadingError = (LinearLayout) findViewById(R.id.review_loading_error);
-        mEmptyReviews = (TextView) findViewById(R.id.tv_empty_reviews);
-        mEmptyTrailers = (TextView) findViewById(R.id.tv_empty_trailers);
 
 //        Unpack the extras from the intent to get chosen movie
         Intent intent = getIntent();
@@ -237,7 +225,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
 
     private void setUpTrailersAdapter(){
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mTrailersRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_trailers_list);
         mTrailersRecyclerView.setLayoutManager(layoutManager);
         mTrailersAdapter = new TrailersAdapter(this);
         mTrailersRecyclerView.setAdapter(mTrailersAdapter);
@@ -245,7 +232,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
 
     private void setUpReviewsAdapter(){
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mReviewsRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews_list);
         mReviewsRecyclerView.setLayoutManager(layoutManager);
         mReviewsAdapter = new ReviewsAdapter();
         mReviewsRecyclerView.setAdapter(mReviewsAdapter);
@@ -404,10 +390,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailersAd
 
                     switch(id){
                         case TRAILER_DETAILS_LOADER:
-                            url = NetworkUtils.buildTrailerUrl(apiKey, movieId);
+                            url = NetworkUtils.buildTrailerUrl(mApiKey, movieId);
                             break;
                         case REVIEW_DETAILS_LOADER:
-                            url = NetworkUtils.buildReviewUrl(apiKey, movieId);
+                            url = NetworkUtils.buildReviewUrl(mApiKey, movieId);
                             break;
                         default:
                             url = null;

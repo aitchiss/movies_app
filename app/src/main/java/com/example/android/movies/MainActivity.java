@@ -28,6 +28,10 @@ import com.example.android.movies.utilities.MovieDbJsonUtils;
 import com.example.android.movies.utilities.NetworkUtils;
 import java.net.URL;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieClickHandler, LoaderManager.LoaderCallbacks<Cursor> {
 
 //    String constants used to refer to API sort options and keys for bundles
@@ -41,12 +45,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private static final int FAVOURITES_LOADER_ID = 10;
     private static final int MOVIES_LOADER_ID = 11;
 
-    private String apiKey;
-    private RecyclerView mMovieRecyclerView;
+    @BindString(R.string.my_api_key) String mApiKey;
+
+    @BindView(R.id.recyclerview_movies_list) RecyclerView mMovieRecyclerView;
+    @BindView(R.id.pb_loading_bar) ProgressBar mLoadingBar;
+    @BindView(R.id.loading_error) LinearLayout mLoadingErrorMessage;
+
     private MoviesAdapter mMoviesAdapter;
     private String mSortOption;
-    private ProgressBar mLoadingBar;
-    private LinearLayout mLoadingErrorMessage;
     private Movie[] mCurrentMovies;
 
 
@@ -54,15 +60,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-//      Retrieve key String from secrets values resource
-        apiKey = getString(R.string.my_api_key);
-
-//        Get a reference to page elements
-        mLoadingBar = (ProgressBar) findViewById(R.id.pb_loading_bar);
-        mLoadingErrorMessage = (LinearLayout) findViewById(R.id.loading_error);
-        mMovieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies_list);
+        ButterKnife.bind(this);
 
 //        Set number of posters in grid according to device orientation
         int currentOrientation = getResources().getConfiguration().orientation;
@@ -142,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 //        only attempt to load movies if device is online or connecting to internet
         if (NetworkUtils.isOnlineOrConnecting(this)){
             mLoadingBar.setVisibility(View.VISIBLE);
-//            URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
             LoaderManager loaderManager = getSupportLoaderManager();
             Loader loader = loaderManager.getLoader(MOVIES_LOADER_ID);
             if (loader == null){
@@ -259,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
                 @Override
                 public Movie[] loadInBackground() {
-                    URL url = NetworkUtils.buildUrl(apiKey, mSortOption);
+                    URL url = NetworkUtils.buildUrl(mApiKey, mSortOption);
                     Movie[] parsedMovieDetails = null;
                     try {
                         String movieResults = NetworkUtils.getResponseFromHttpUrl(url);
