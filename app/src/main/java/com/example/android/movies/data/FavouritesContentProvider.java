@@ -21,14 +21,14 @@ public class FavouritesContentProvider extends ContentProvider {
 
     private FavouritesDbHelper mFavouritesDbHelper;
 
-    public static final int FAVOURITES = 100;
-    public static final int FAVOURITES_WITH_ID = 101;
+    private static final int FAVOURITES = 100;
+    private static final int FAVOURITES_WITH_ID = 101;
 
     private static final String MOVIE_ID_SELECTION = FavouritesContract.FavouritesEntry.COLUMN_MOVIE_ID + "=?";
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
-    public static UriMatcher buildUriMatcher(){
+    private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(FavouritesContract.AUTHORITY, FavouritesContract.PATH_FAVOURITES, FAVOURITES);
         uriMatcher.addURI(FavouritesContract.AUTHORITY, FavouritesContract.PATH_FAVOURITES + "/#", FAVOURITES_WITH_ID);
@@ -63,11 +63,10 @@ public class FavouritesContentProvider extends ContentProvider {
                 break;
             case FAVOURITES_WITH_ID:
                 String movieId = uri.getPathSegments().get(1);
-                String mSelection = MOVIE_ID_SELECTION;
                 String[] mSelectionArgs = new String[]{movieId};
                 returnCursor = db.query(FavouritesContract.FavouritesEntry.TABLE_NAME,
                         projection,
-                        mSelection,
+                        MOVIE_ID_SELECTION,
                         mSelectionArgs,
                         null,
                         null,

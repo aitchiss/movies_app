@@ -1,13 +1,7 @@
 package com.example.android.movies;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Parcelable;
-import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;

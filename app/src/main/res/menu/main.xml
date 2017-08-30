@@ -11,5 +11,5 @@
 
     <item
         android:id="@+id/action_favourites"
-        android:title="Favourites" />
+        android:title="@string/favourites_menu_item" />
 </menu>
